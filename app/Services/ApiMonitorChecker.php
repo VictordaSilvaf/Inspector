@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
+use App\Exceptions\InvalidMonitorUrlException;
 use App\Models\ApiMonitor;
 use App\Models\ApiMonitorCheck;
 use App\Services\Alerts\MonitorAlertEvaluator;
+use App\Services\Security\MonitorSecretAuditService;
+use App\Services\Security\MonitorUrlGuard;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 
@@ -15,16 +19,48 @@ class ApiMonitorChecker
 
     private const int BodyPreviewLimit = 500;
 
+    private const int MaxResponseBytes = 65_536;
+
     public function __construct(
-        private MonitorAlertEvaluator $alertEvaluator,
+        private readonly MonitorAlertEvaluator $alertEvaluator,
+        private readonly ApiMonitorSecretService $secretService,
+        private readonly ApiMonitorHeaderService $headerService,
+        private readonly MonitorUrlGuard $urlGuard,
+        private readonly MonitorSecretAuditService $auditService,
     ) {}
 
     public function check(ApiMonitor $monitor, string $triggeredBy = 'manual'): ApiMonitorCheck
     {
+        $monitor->loadMissing(['secret', 'headers']);
+
+        try {
+            $this->urlGuard->assertSafe($monitor->url);
+        } catch (InvalidMonitorUrlException $exception) {
+            $this->auditService->record(
+                $monitor,
+                MonitorSecretAuditService::ACTION_URL_BLOCKED,
+                null,
+                ['reason' => $exception->reason],
+            );
+
+            $check = $this->recordFailure(
+                $monitor,
+                $triggeredBy,
+                'O endereço configurado não pode ser monitorado.',
+            );
+            $this->evaluateAlerts($monitor, $check);
+
+            return $check;
+        }
+
         $startedAt = hrtime(true);
 
         try {
             $pendingRequest = Http::timeout($monitor->timeout_seconds ?? 10)
+                ->withOptions([
+                    'allow_redirects' => false,
+                    'http_errors' => false,
+                ])
                 ->withHeaders($this->buildHeaders($monitor));
 
             $response = match (strtoupper($monitor->http_method)) {
@@ -35,7 +71,7 @@ class ApiMonitorChecker
             };
 
             $responseTimeMs = (int) round((hrtime(true) - $startedAt) / 1_000_000);
-            $body = $response->body();
+            $body = $this->readLimitedBody($response);
 
             $status = $this->resolveStatus(
                 $response->successful(),
@@ -80,30 +116,37 @@ class ApiMonitorChecker
      */
     private function buildHeaders(ApiMonitor $monitor): array
     {
-        $headers = [];
+        $headers = $this->headerService->resolveForRequest($monitor);
+        $secrets = $this->secretService->resolve($monitor);
+        $metadata = is_array($monitor->auth_metadata) ? $monitor->auth_metadata : [];
 
-        if ($monitor->auth_type === 'basic' && is_array($monitor->auth_config)) {
-            $username = $monitor->auth_config['username'] ?? '';
-            $password = $monitor->auth_config['password'] ?? '';
+        if ($monitor->auth_type === 'basic') {
+            $username = (string) ($metadata['username'] ?? '');
+            $password = (string) ($secrets['password'] ?? '');
             $headers['Authorization'] = 'Basic '.base64_encode("{$username}:{$password}");
         }
 
-        if ($monitor->auth_type === 'bearer' && is_array($monitor->auth_config)) {
-            $headers['Authorization'] = 'Bearer '.($monitor->auth_config['token'] ?? '');
+        if ($monitor->auth_type === 'bearer') {
+            $headers['Authorization'] = 'Bearer '.((string) ($secrets['token'] ?? ''));
         }
 
-        if ($monitor->auth_type === 'api_key' && is_array($monitor->auth_config)) {
-            $headerName = $monitor->auth_config['header_name'] ?? 'X-API-Key';
-            $headers[$headerName] = $monitor->auth_config['api_key'] ?? '';
-        }
-
-        foreach ($monitor->custom_headers ?? [] as $header) {
-            if (! empty($header['key'])) {
-                $headers[$header['key']] = $header['value'] ?? '';
-            }
+        if ($monitor->auth_type === 'api_key') {
+            $headerName = (string) ($metadata['headerName'] ?? 'X-API-Key');
+            $headers[$headerName] = (string) ($secrets['api_key'] ?? '');
         }
 
         return $headers;
+    }
+
+    private function readLimitedBody(Response $response): string
+    {
+        $body = $response->body();
+
+        if (strlen($body) <= self::MaxResponseBytes) {
+            return $body;
+        }
+
+        return substr($body, 0, self::MaxResponseBytes);
     }
 
     private function resolveStatus(

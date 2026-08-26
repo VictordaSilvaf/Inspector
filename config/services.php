@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'monitor_secrets' => [
+        'key' => env('MONITOR_SECRETS_KEY'),
+    ],
+
+    'monitor_urls' => [
+        'require_https' => env('MONITOR_URL_REQUIRE_HTTPS', false),
+        'require_dns' => env('MONITOR_URL_REQUIRE_DNS', true),
+    ],
+
 ];

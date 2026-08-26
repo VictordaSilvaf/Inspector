@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\ApiInspector;
 
+use App\Rules\SafeMonitorUrl;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -15,7 +16,7 @@ class StoreApiMonitorRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'url' => ['required', 'string', 'url', 'max:2048', 'regex:/^https?:\/\//i'],
+            'url' => ['required', 'string', 'url', 'max:2048', 'regex:/^https?:\/\//i', new SafeMonitorUrl],
             'http_method' => ['required', Rule::in(['GET', 'POST', 'PUT', 'DELETE'])],
             'interval_seconds' => ['required', 'integer', Rule::in([10, 30, 60])],
             'auth_type' => ['required', Rule::in(['none', 'basic', 'bearer', 'api_key'])],

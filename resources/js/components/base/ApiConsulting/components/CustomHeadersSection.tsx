@@ -14,6 +14,8 @@ type CustomHeadersSectionProps = {
     onAdd: () => void;
     onRemove: (id: string) => void;
     onUpdate: (id: string, field: 'key' | 'value', value: string) => void;
+    onStartRotating?: (id: string) => void;
+    onCancelRotating?: (id: string) => void;
     onSubmit: () => void;
 };
 
@@ -24,6 +26,8 @@ function CustomHeadersSection({
     onAdd,
     onRemove,
     onUpdate,
+    onStartRotating,
+    onCancelRotating,
     onSubmit,
 }: Readonly<CustomHeadersSectionProps>) {
     return (
@@ -65,6 +69,8 @@ function CustomHeadersSection({
                             isLoading={isLoading}
                             onUpdate={onUpdate}
                             onRemove={onRemove}
+                            onStartRotating={onStartRotating}
+                            onCancelRotating={onCancelRotating}
                             onSubmit={onSubmit}
                         />
                     ))}

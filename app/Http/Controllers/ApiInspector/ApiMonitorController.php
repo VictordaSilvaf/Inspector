@@ -8,6 +8,7 @@ use App\Http\Requests\ApiInspector\UpdateApiMonitorRequest;
 use App\Models\ApiMonitor;
 use App\Models\ApiMonitorCheck;
 use App\Services\ApiMonitorChecker;
+use App\Services\ApiMonitorPersistenceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,13 +18,18 @@ use Inertia\Response;
 
 class ApiMonitorController extends Controller
 {
+    public function __construct(
+        private readonly ApiMonitorPersistenceService $persistence,
+    ) {}
+
     public function index(Request $request): Response
     {
         $monitors = $request->user()
             ->apiMonitors()
+            ->with('headers')
             ->latest()
             ->get()
-            ->map(fn (ApiMonitor $monitor): array => $monitor->toFrontendArray());
+            ->map(fn (ApiMonitor $monitor): array => $this->persistence->toFrontendArray($monitor));
 
         return Inertia::render('ApiInspector/index', [
             'monitors' => $monitors,
@@ -52,7 +58,8 @@ class ApiMonitorController extends Controller
         StoreApiMonitorRequest $request,
         ApiMonitorChecker $checker,
     ): RedirectResponse {
-        $monitor = $request->user()->apiMonitors()->create($request->validated());
+        $result = $this->persistence->createFromStoreRequest($request);
+        $monitor = $result['monitor'];
 
         $checker->check($monitor, 'manual');
 
@@ -68,6 +75,8 @@ class ApiMonitorController extends Controller
     {
         Gate::authorize('view', $apiMonitor);
 
+        $apiMonitor->load(['secret', 'headers']);
+
         $checks = Inertia::scroll(
             fn () => $apiMonitor->checks()
                 ->latest('checked_at')
@@ -77,7 +86,7 @@ class ApiMonitorController extends Controller
         );
 
         return Inertia::render('ApiInspector/show', [
-            'monitor' => $apiMonitor->toDetailArray(),
+            'monitor' => $this->persistence->toEditableArray($apiMonitor),
             'checks' => $checks,
         ]);
     }
@@ -86,7 +95,7 @@ class ApiMonitorController extends Controller
         UpdateApiMonitorRequest $request,
         ApiMonitor $apiMonitor,
     ): RedirectResponse {
-        $apiMonitor->update($request->validated());
+        $this->persistence->updateFromRequest($request, $apiMonitor);
 
         Inertia::flash('toast', [
             'type' => 'success',

@@ -57,6 +57,12 @@ function ApiConsulting({
         needsAdditionalInformation,
         addAuthentication,
         removeAuthentication,
+        secretConfigured,
+        isRotatingSecret,
+        startRotatingSecret,
+        cancelRotatingSecret,
+        startRotatingCustomHeader,
+        cancelRotatingCustomHeader,
     } = useClientApiProvider({
         initialValues,
         mode,
@@ -131,6 +137,11 @@ function ApiConsulting({
                 headerName={headerName}
                 authErrors={authErrors}
                 isLoading={isLoading}
+                secretConfigured={secretConfigured}
+                hasPassword={initialValues?.authConfig.hasPassword ?? false}
+                isRotatingSecret={isRotatingSecret}
+                onStartRotatingSecret={startRotatingSecret}
+                onCancelRotatingSecret={cancelRotatingSecret}
                 onAuthMethodChange={setAuthMethod}
                 onUsernameChange={setUsername}
                 onPasswordChange={setPassword}
@@ -149,6 +160,8 @@ function ApiConsulting({
                 onAdd={addCustomHeader}
                 onRemove={removeCustomHeader}
                 onUpdate={updateCustomHeader}
+                onStartRotating={startRotatingCustomHeader}
+                onCancelRotating={cancelRotatingCustomHeader}
                 onSubmit={onSave}
             />
         </div>

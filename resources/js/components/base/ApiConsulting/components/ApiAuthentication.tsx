@@ -30,6 +30,11 @@ type ApiAuthenticationProps = {
     headerName: string;
     authErrors: AuthFieldErrors;
     isLoading: boolean;
+    secretConfigured?: boolean;
+    hasPassword?: boolean;
+    isRotatingSecret?: boolean;
+    onStartRotatingSecret?: () => void;
+    onCancelRotatingSecret?: () => void;
     onAuthMethodChange: (value: ApiAuthMethod) => void;
     onUsernameChange: (value: string) => void;
     onPasswordChange: (value: string) => void;
@@ -51,6 +56,11 @@ function ApiAuthentication({
     headerName,
     authErrors,
     isLoading,
+    secretConfigured = false,
+    hasPassword = false,
+    isRotatingSecret = false,
+    onStartRotatingSecret,
+    onCancelRotatingSecret,
     onAuthMethodChange,
     onUsernameChange,
     onPasswordChange,
@@ -157,6 +167,10 @@ function ApiAuthentication({
                                 password={password}
                                 authErrors={authErrors}
                                 isLoading={isLoading}
+                                hasPassword={hasPassword}
+                                isRotating={isRotatingSecret}
+                                onStartRotating={onStartRotatingSecret}
+                                onCancelRotating={onCancelRotatingSecret}
                                 onUsernameChange={onUsernameChange}
                                 onPasswordChange={onPasswordChange}
                                 onSubmit={onSubmit}
@@ -168,6 +182,10 @@ function ApiAuthentication({
                                 token={token}
                                 authErrors={authErrors}
                                 isLoading={isLoading}
+                                configured={secretConfigured}
+                                isRotating={isRotatingSecret}
+                                onStartRotating={onStartRotatingSecret}
+                                onCancelRotating={onCancelRotatingSecret}
                                 onTokenChange={onTokenChange}
                                 onSubmit={onSubmit}
                             />
@@ -179,6 +197,10 @@ function ApiAuthentication({
                                 apiKey={apiKey}
                                 authErrors={authErrors}
                                 isLoading={isLoading}
+                                configured={secretConfigured}
+                                isRotating={isRotatingSecret}
+                                onStartRotating={onStartRotatingSecret}
+                                onCancelRotating={onCancelRotatingSecret}
                                 onHeaderNameChange={onHeaderNameChange}
                                 onApiKeyChange={onApiKeyChange}
                                 onSubmit={onSubmit}

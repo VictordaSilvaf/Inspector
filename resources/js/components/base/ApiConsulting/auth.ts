@@ -49,6 +49,9 @@ type CustomHeader = {
     id: string;
     key: string;
     value: string;
+    configured?: boolean;
+    isSensitive?: boolean;
+    isRotating?: boolean;
 };
 
 function createCustomHeader(): CustomHeader {

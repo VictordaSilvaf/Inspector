@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\ApiMonitor;
 use App\Models\User;
+use App\Services\ApiMonitorHeaderService;
+use App\Services\ApiMonitorSecretService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,10 +24,7 @@ class ApiMonitorFactory extends Factory
             'url' => fake()->url(),
             'http_method' => 'GET',
             'auth_type' => 'none',
-            'auth_config' => null,
-            'custom_headers' => [
-                ['key' => 'Accept', 'value' => 'application/json'],
-            ],
+            'auth_metadata' => null,
             'interval_seconds' => 30,
             'timeout_seconds' => 10,
             'expected_status_code' => 200,
@@ -35,6 +34,15 @@ class ApiMonitorFactory extends Factory
             'last_checked_at' => now(),
             'consecutive_failures' => 0,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (ApiMonitor $monitor): void {
+            app(ApiMonitorHeaderService::class)->sync($monitor, [
+                ['key' => 'Accept', 'value' => 'application/json'],
+            ]);
+        });
     }
 
     public function unchecked(): static
@@ -50,8 +58,10 @@ class ApiMonitorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'auth_type' => 'bearer',
-            'auth_config' => ['token' => $token],
-        ]);
+            'auth_metadata' => ['configured' => true],
+        ])->afterCreating(function (ApiMonitor $monitor) use ($token): void {
+            app(ApiMonitorSecretService::class)->store($monitor, ['token' => $token]);
+        });
     }
 
     public function inactive(): static

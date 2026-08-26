@@ -13,6 +13,8 @@ type CustomHeaderRowProps = {
     isLoading: boolean;
     onUpdate: (id: string, field: 'key' | 'value', value: string) => void;
     onRemove: (id: string) => void;
+    onStartRotating?: (id: string) => void;
+    onCancelRotating?: (id: string) => void;
     onSubmit: () => void;
 };
 
@@ -23,8 +25,15 @@ function CustomHeaderRow({
     isLoading,
     onUpdate,
     onRemove,
+    onStartRotating,
+    onCancelRotating,
     onSubmit,
 }: Readonly<CustomHeaderRowProps>) {
+    const showMaskedValue =
+        header.configured === true
+        && header.isSensitive === true
+        && header.isRotating !== true;
+
     return (
         <motion.div
             layout
@@ -59,31 +68,60 @@ function CustomHeaderRow({
 
             <div className="space-y-2">
                 <Label htmlFor={`header-value-${header.id}`}>Valor</Label>
-                <Input
-                    id={`header-value-${header.id}`}
-                    type="text"
-                    placeholder="application/json"
-                    value={header.value}
-                    onChange={(e) =>
-                        onUpdate(header.id, 'value', e.target.value)
-                    }
-                    aria-invalid={valueError !== undefined}
-                    disabled={isLoading}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            onSubmit();
-                        }
-                    }}
-                />
+                {showMaskedValue ? (
+                    <div className="flex flex-col gap-2">
+                        <p className="rounded-md border bg-muted px-3 py-2 font-mono text-sm">
+                            ••••••
+                        </p>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => onStartRotating?.(header.id)}
+                            disabled={isLoading}
+                        >
+                            Alterar valor
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        <Input
+                            id={`header-value-${header.id}`}
+                            type={header.isSensitive ? 'password' : 'text'}
+                            placeholder="application/json"
+                            value={header.value}
+                            onChange={(e) =>
+                                onUpdate(header.id, 'value', e.target.value)
+                            }
+                            aria-invalid={valueError !== undefined}
+                            disabled={isLoading}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    onSubmit();
+                                }
+                            }}
+                        />
+                        {header.configured && onCancelRotating !== undefined && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className="px-0"
+                                onClick={() => onCancelRotating(header.id)}
+                                disabled={isLoading}
+                            >
+                                Manter valor atual
+                            </Button>
+                        )}
+                    </div>
+                )}
                 <InputError message={valueError} />
             </div>
 
-            <div className="flex h-full items-end justify-end mt-1">
+            <div className="mt-1 flex h-full items-end justify-end">
                 <Button
                     type="button"
                     variant="destructive"
                     size="icon"
-                    className="w-full sm:size-12 py-6"
+                    className="w-full py-6 sm:size-12"
                     onClick={() => onRemove(header.id)}
                     disabled={isLoading}
                     aria-label="Remover header"

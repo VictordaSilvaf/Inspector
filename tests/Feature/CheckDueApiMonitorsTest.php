@@ -2,6 +2,7 @@
 
 use App\Models\ApiMonitor;
 use App\Models\ApiMonitorCheck;
+use App\Services\ApiMonitorHeaderService;
 use Illuminate\Support\Facades\Http;
 
 test('api monitors check command runs due monitors', function () {
@@ -62,15 +63,16 @@ test('api monitors check command uses stored auth and headers', function () {
         'https://api.example.com/secure' => Http::response([], 200),
     ]);
 
-    ApiMonitor::factory()
+    $monitor = ApiMonitor::factory()
         ->withBearerAuth('secret-token')
         ->dueForCheck()
         ->create([
             'url' => 'https://api.example.com/secure',
-            'custom_headers' => [
-                ['key' => 'X-Custom', 'value' => 'test-value'],
-            ],
         ]);
+
+    app(ApiMonitorHeaderService::class)->sync($monitor, [
+        ['key' => 'X-Custom', 'value' => 'test-value'],
+    ]);
 
     $this->artisan('api-monitors:check')->assertSuccessful();
 
@@ -83,6 +85,23 @@ test('api monitors check command uses stored auth and headers', function () {
     expect(
         ApiMonitorCheck::query()->first()?->triggered_by
     )->toBe('scheduled');
+});
+
+test('api monitors check command skips unsafe monitor urls', function () {
+    Http::fake();
+
+    ApiMonitor::factory()->dueForCheck()->create([
+        'url' => 'http://127.0.0.1/health',
+    ]);
+
+    $this->artisan('api-monitors:check')
+        ->expectsOutputToContain('Checked 1 API monitor(s).')
+        ->assertSuccessful();
+
+    Http::assertNothingSent();
+    expect(ApiMonitorCheck::query()->count())->toBe(1);
+    expect(ApiMonitorCheck::query()->first()?->error_message)
+        ->toBe('O endereço configurado não pode ser monitorado.');
 });
 
 test('api monitor is due when last check is older than interval', function () {

@@ -2,7 +2,9 @@
 
 use App\Models\ApiMonitor;
 use App\Models\ApiMonitorCheck;
+use App\Models\ApiMonitorSecret;
 use App\Models\User;
+use App\Services\ApiMonitorSecretService;
 use Illuminate\Support\Facades\Http;
 
 test('guests are redirected when listing api monitors', function () {
@@ -179,6 +181,42 @@ test('store api monitor requires bearer token when auth type is bearer', functio
         ->assertRedirect(route('api-inspector.create'));
 });
 
+test('store api monitor rejects internal urls', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->from(route('api-inspector.create'))->post(route('api-inspector.store'), [
+        'name' => 'Internal API',
+        'url' => 'http://127.0.0.1/health',
+        'http_method' => 'GET',
+        'interval_seconds' => 30,
+        'auth_type' => 'none',
+    ]);
+
+    $response
+        ->assertSessionHasErrors('url')
+        ->assertRedirect(route('api-inspector.create'));
+
+    expect(ApiMonitor::query()->count())->toBe(0);
+});
+
+test('update api monitor rejects internal urls', function () {
+    $user = User::factory()->create();
+    $monitor = ApiMonitor::factory()->for($user)->create([
+        'url' => 'https://api.example.com/health',
+    ]);
+
+    $response = $this->actingAs($user)->put(route('api-inspector.update', $monitor), [
+        'name' => $monitor->name,
+        'url' => 'http://localhost/health',
+        'http_method' => $monitor->http_method,
+        'interval_seconds' => $monitor->interval_seconds,
+        'auth_type' => 'none',
+    ]);
+
+    $response->assertSessionHasErrors('url');
+    expect($monitor->fresh()->url)->toBe('https://api.example.com/health');
+});
+
 test('guests are redirected when viewing an api monitor', function () {
     $monitor = ApiMonitor::factory()->create();
 
@@ -196,9 +234,9 @@ test('users cannot view another users api monitor', function () {
     $response->assertForbidden();
 });
 
-test('authenticated users can view their api monitor details and checks', function () {
+test('authenticated users can view their api monitor details without secrets', function () {
     $user = User::factory()->create();
-    $monitor = ApiMonitor::factory()->for($user)->create([
+    $monitor = ApiMonitor::factory()->for($user)->withBearerAuth('hidden-token')->create([
         'name' => 'Public API',
         'url' => 'https://api.example.com/health',
         'interval_seconds' => 30,
@@ -221,10 +259,14 @@ test('authenticated users can view their api monitor details and checks', functi
             ->where('monitor.name', 'Public API')
             ->where('monitor.url', 'https://api.example.com/health')
             ->where('monitor.intervalSeconds', 30)
+            ->where('monitor.authConfig.configured', true)
             ->has('checks.data', 1)
             ->where('checks.data.0.id', $check->id)
             ->where('checks.data.0.status', 'success')
             ->where('checks.data.0.httpStatusCode', 200)
+            ->missing('monitor.authConfig.token')
+            ->missing('monitor.authConfig.password')
+            ->missing('monitor.authConfig.apiKey')
         );
 });
 
@@ -290,7 +332,35 @@ test('authenticated users can update their api monitor', function () {
     expect($monitor->http_method)->toBe('POST');
     expect($monitor->interval_seconds)->toBe(60);
     expect($monitor->auth_type)->toBe('bearer');
-    expect($monitor->auth_config['token'] ?? null)->toBe('updated-token');
+    expect(app(ApiMonitorSecretService::class)->resolve($monitor))
+        ->toBe(['token' => 'updated-token']);
+});
+
+test('authenticated users can update monitor url without resubmitting bearer token', function () {
+    $user = User::factory()->create();
+    $monitor = ApiMonitor::factory()->for($user)->withBearerAuth('keep-me')->create([
+        'url' => 'https://api.example.com/old',
+    ]);
+
+    $response = $this->actingAs($user)->put(route('api-inspector.update', $monitor), [
+        'name' => $monitor->name,
+        'url' => 'https://api.example.com/new-url',
+        'http_method' => $monitor->http_method,
+        'interval_seconds' => $monitor->interval_seconds,
+        'auth_type' => 'bearer',
+        'auth_config' => [],
+        'custom_headers' => [
+            ['key' => 'Accept'],
+        ],
+    ]);
+
+    $response->assertSessionHasNoErrors();
+
+    $monitor->refresh();
+
+    expect($monitor->url)->toBe('https://api.example.com/new-url');
+    expect(app(ApiMonitorSecretService::class)->resolve($monitor))
+        ->toBe(['token' => 'keep-me']);
 });
 
 test('users cannot update another users api monitor', function () {
@@ -310,4 +380,30 @@ test('users cannot update another users api monitor', function () {
     $response->assertForbidden();
 
     expect($monitor->fresh()->name)->toBe('Private API');
+});
+
+test('store api monitor persists secrets in dedicated table', function () {
+    Http::fake([
+        'https://api.example.com/secure' => Http::response([], 200),
+    ]);
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->post(route('api-inspector.store'), [
+        'name' => 'Secure API',
+        'url' => 'https://api.example.com/secure',
+        'http_method' => 'GET',
+        'interval_seconds' => 30,
+        'auth_type' => 'bearer',
+        'auth_config' => [
+            'token' => 'store-token',
+        ],
+    ])->assertSessionHasNoErrors();
+
+    $monitor = ApiMonitor::query()->first();
+
+    expect($monitor)->not->toBeNull();
+    expect(ApiMonitorSecret::query()->where('api_monitor_id', $monitor->id)->exists())->toBeTrue();
+    expect(app(ApiMonitorSecretService::class)->resolve($monitor))
+        ->toBe(['token' => 'store-token']);
 });

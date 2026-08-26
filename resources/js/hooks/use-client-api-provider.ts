@@ -40,17 +40,23 @@ type StoreApiMonitorPayload = {
     interval_seconds: ApiMonitorIntervalSeconds;
     auth_type: 'none' | 'basic' | 'bearer' | 'api_key';
     auth_config: Record<string, string> | null;
-    custom_headers: Array<{ key: string; value: string }> | null;
+    custom_headers: Array<{ key: string; value?: string }> | null;
 };
 
 type ServerValidationErrors = Record<string, string>;
 
 type ApiMonitorAuthConfig = {
-    username: string;
-    password: string;
-    token: string;
-    apiKey: string;
-    headerName: string;
+    username?: string;
+    hasPassword?: boolean;
+    configured?: boolean;
+    headerName?: string;
+};
+
+type ApiMonitorCustomHeader = {
+    name: string;
+    configured: boolean;
+    isSensitive: boolean;
+    value?: string;
 };
 
 type ApiMonitorFormInitialValues = {
@@ -61,7 +67,7 @@ type ApiMonitorFormInitialValues = {
     intervalSeconds: ApiMonitorIntervalSeconds;
     authType: 'none' | 'basic' | 'bearer' | 'api_key';
     authConfig: ApiMonitorAuthConfig;
-    customHeaders: Array<{ key: string; value: string }>;
+    customHeaders: ApiMonitorCustomHeader[];
 };
 
 type UseClientApiProviderOptions = {
@@ -169,6 +175,19 @@ function resolveInitialInterval(
     return DEFAULT_API_MONITOR_INTERVAL_SECONDS;
 }
 
+function mapServerCustomHeaders(
+    headers: ApiMonitorCustomHeader[],
+): CustomHeader[] {
+    return headers.map((header) => ({
+        ...createCustomHeader(),
+        key: header.name,
+        value: header.isSensitive ? '' : (header.value ?? ''),
+        configured: header.configured,
+        isSensitive: header.isSensitive,
+        isRotating: false,
+    }));
+}
+
 function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
     const { initialValues, mode = 'create' } = options;
     const { errors: pageErrors } = usePage<{ errors: ServerValidationErrors }>()
@@ -191,21 +210,17 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
     const [username, setUsername] = useState(
         initialValues?.authConfig.username ?? '',
     );
-    const [password, setPassword] = useState(
-        initialValues?.authConfig.password ?? '',
-    );
-    const [token, setToken] = useState(initialValues?.authConfig.token ?? '');
-    const [apiKey, setApiKey] = useState(initialValues?.authConfig.apiKey ?? '');
+    const [password, setPassword] = useState('');
+    const [token, setToken] = useState('');
+    const [apiKey, setApiKey] = useState('');
     const [headerName, setHeaderName] = useState(
         initialValues?.authConfig.headerName || DEFAULT_API_KEY_HEADER,
     );
-    const [customHeaders, setCustomHeaders] = useState<CustomHeader[]>(
-        () =>
-            (initialValues?.customHeaders ?? []).map((header) => ({
-                ...createCustomHeader(),
-                key: header.key,
-                value: header.value,
-            })),
+    const [isRotatingSecret, setIsRotatingSecret] = useState(false);
+    const [customHeaders, setCustomHeaders] = useState<CustomHeader[]>(() =>
+        initialValues !== undefined
+            ? mapServerCustomHeaders(initialValues.customHeaders)
+            : [],
     );
     const [nameError, setNameError] = useState<string | null>(null);
     const [intervalError, setIntervalError] = useState<string | null>(null);
@@ -220,6 +235,12 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
                 ? initialValues.authType !== 'none'
                 : false,
         );
+
+    const secretConfigured =
+        mode === 'update'
+        && (initialValues?.authConfig.configured
+            || initialValues?.authConfig.hasPassword
+            || false);
 
     const clearAuthFieldError = (field: keyof AuthFieldErrors): void => {
         if (authErrors[field] !== undefined) {
@@ -261,15 +282,40 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
     const addAuthentication = (): void => {
         setNeedsAdditionalInformation(true);
         setAuthErrors({});
+        setIsRotatingSecret(false);
     };
 
     const removeAuthentication = (): void => {
         setNeedsAdditionalInformation(false);
         setAuthErrors({});
+        setIsRotatingSecret(false);
+        setPassword('');
+        setToken('');
+        setApiKey('');
     };
 
     const updateAuthMethod = (value: ApiAuthMethod): void => {
         setAuthMethod(value);
+        setAuthErrors({});
+        setIsRotatingSecret(false);
+        setPassword('');
+        setToken('');
+        setApiKey('');
+    };
+
+    const startRotatingSecret = (): void => {
+        setIsRotatingSecret(true);
+        setPassword('');
+        setToken('');
+        setApiKey('');
+        setAuthErrors({});
+    };
+
+    const cancelRotatingSecret = (): void => {
+        setIsRotatingSecret(false);
+        setPassword('');
+        setToken('');
+        setApiKey('');
         setAuthErrors({});
     };
 
@@ -347,6 +393,26 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         }
     };
 
+    const startRotatingCustomHeader = (id: string): void => {
+        setCustomHeaders((current) =>
+            current.map((header) =>
+                header.id === id
+                    ? { ...header, isRotating: true, value: '' }
+                    : header,
+            ),
+        );
+    };
+
+    const cancelRotatingCustomHeader = (id: string): void => {
+        setCustomHeaders((current) =>
+            current.map((header) =>
+                header.id === id
+                    ? { ...header, isRotating: false, value: '' }
+                    : header,
+            ),
+        );
+    };
+
     const buildPayload = async (): Promise<StoreApiMonitorPayload> => {
         if (name.trim() === '') {
             throw new ValidationError('Informe o nome do monitor.');
@@ -358,30 +424,101 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         );
 
         let auth: ApiAuth | undefined;
+        const requiresSecretInput =
+            mode === 'create'
+            || isRotatingSecret
+            || (needsAdditionalInformation && !secretConfigured);
 
         if (needsAdditionalInformation) {
-            const validatedAuth = await apiAuthSchema.validate(
-                {
+            if (requiresSecretInput) {
+                const validatedAuth = await apiAuthSchema.validate(
+                    {
+                        method: authMethod,
+                        username,
+                        password,
+                        token,
+                        apiKey,
+                        headerName,
+                    },
+                    { abortEarly: false },
+                );
+
+                auth = toApiAuth(validatedAuth);
+            } else {
+                if (authMethod === 'basic' && username.trim() === '') {
+                    throw new ValidationError('Informe o usuário da API.');
+                }
+
+                if (authMethod === 'api-key' && headerName.trim() === '') {
+                    throw new ValidationError(
+                        'Informe o nome do header da API Key.',
+                    );
+                }
+
+                auth = toApiAuth({
                     method: authMethod,
                     username,
-                    password,
-                    token,
-                    apiKey,
+                    password: '',
+                    token: '',
+                    apiKey: '',
                     headerName,
-                },
-                { abortEarly: false },
-            );
-
-            auth = toApiAuth(validatedAuth);
+                });
+            }
         }
 
         const filledHeaders = filterFilledCustomHeaders(customHeaders);
-        const validatedCustomHeaders = await customHeadersSchema.validate(
-            filledHeaders,
-            {
+        const headersForValidation = filledHeaders.filter((header) => {
+            if (mode === 'update' && header.configured && header.isSensitive && !header.isRotating) {
+                return header.key.trim() !== '';
+            }
+
+            return true;
+        });
+
+        if (headersForValidation.length > 0) {
+            await customHeadersSchema.validate(headersForValidation, {
                 abortEarly: false,
-            },
-        );
+            });
+        }
+
+        const payloadHeaders = filledHeaders.map((header) => {
+            const item: { key: string; value?: string } = {
+                key: header.key.trim(),
+            };
+
+            if (
+                mode === 'update'
+                && header.configured
+                && header.isSensitive
+                && !header.isRotating
+                && header.value.trim() === ''
+            ) {
+                return item;
+            }
+
+            if (header.value.trim() !== '') {
+                item.value = header.value;
+            }
+
+            return item;
+        });
+
+        const authConfig =
+            auth !== undefined ? mapAuthToConfig(auth) : null;
+
+        if (authConfig !== null && mode === 'update' && !requiresSecretInput) {
+            if (authMethod === 'bearer') {
+                delete authConfig.token;
+            }
+
+            if (authMethod === 'basic') {
+                delete authConfig.password;
+            }
+
+            if (authMethod === 'api-key') {
+                delete authConfig.api_key;
+            }
+        }
 
         return {
             name: name.trim(),
@@ -392,16 +529,9 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
                 auth !== undefined
                     ? mapAuthMethodToAuthType(auth.method)
                     : 'none',
-            auth_config:
-                auth !== undefined ? mapAuthToConfig(auth) : null,
+            auth_config: authConfig,
             custom_headers:
-                validatedCustomHeaders !== undefined
-                && validatedCustomHeaders.length > 0
-                    ? validatedCustomHeaders.map((header) => ({
-                          key: header.key,
-                          value: header.value,
-                      }))
-                    : null,
+                payloadHeaders.length > 0 ? payloadHeaders : null,
         };
     };
 
@@ -505,6 +635,8 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         addCustomHeader,
         removeCustomHeader,
         updateCustomHeader,
+        startRotatingCustomHeader,
+        cancelRotatingCustomHeader,
         error: error ?? pageErrors?.url ?? null,
         authErrors,
         customHeaderErrors,
@@ -513,6 +645,10 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         needsAdditionalInformation,
         addAuthentication,
         removeAuthentication,
+        secretConfigured,
+        isRotatingSecret,
+        startRotatingSecret,
+        cancelRotatingSecret,
         mode,
     };
 }

@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Database\Factories\ApiMonitorFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -18,8 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $url
  * @property string $http_method
  * @property string $auth_type
- * @property array<string, mixed>|null $auth_config
- * @property array<int, array{key: string, value: string}>|null $custom_headers
+ * @property array<string, mixed>|null $auth_metadata
  * @property int $interval_seconds
  * @property int $timeout_seconds
  * @property int $expected_status_code
@@ -30,6 +30,8 @@ use Illuminate\Support\Carbon;
  * @property int $consecutive_failures
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read ApiMonitorSecret|null $secret
+ * @property-read Collection<int, ApiMonitorHeader> $headers
  */
 #[Fillable([
     'user_id',
@@ -37,8 +39,7 @@ use Illuminate\Support\Carbon;
     'url',
     'http_method',
     'auth_type',
-    'auth_config',
-    'custom_headers',
+    'auth_metadata',
     'interval_seconds',
     'timeout_seconds',
     'expected_status_code',
@@ -48,7 +49,6 @@ use Illuminate\Support\Carbon;
     'last_checked_at',
     'consecutive_failures',
 ])]
-#[Hidden(['auth_config'])]
 class ApiMonitor extends Model
 {
     /** @use HasFactory<ApiMonitorFactory> */
@@ -91,6 +91,22 @@ class ApiMonitor extends Model
         return $this->hasMany(MonitorAlert::class);
     }
 
+    /**
+     * @return HasOne<ApiMonitorSecret, $this>
+     */
+    public function secret(): HasOne
+    {
+        return $this->hasOne(ApiMonitorSecret::class);
+    }
+
+    /**
+     * @return HasMany<ApiMonitorHeader, $this>
+     */
+    public function headers(): HasMany
+    {
+        return $this->hasMany(ApiMonitorHeader::class);
+    }
+
     public function isDueForCheck(): bool
     {
         if (! $this->is_active) {
@@ -110,26 +126,6 @@ class ApiMonitor extends Model
     /**
      * @return array<string, mixed>
      */
-    public function toFrontendArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'url' => $this->url,
-            'httpMethod' => $this->http_method,
-            'intervalSeconds' => $this->interval_seconds,
-            'expectedStatusCode' => $this->expected_status_code,
-            'customHeaders' => $this->custom_headers ?? [],
-            'lastStatus' => $this->last_status,
-            'lastResponseTimeMs' => $this->last_response_time_ms,
-            'hasAuthentication' => $this->auth_type !== 'none',
-            'lastCheckedAt' => $this->last_checked_at?->toIso8601String(),
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
     public function toStatusArray(): array
     {
         return [
@@ -141,35 +137,12 @@ class ApiMonitor extends Model
     }
 
     /**
-     * @return array<string, mixed>
-     */
-    public function toDetailArray(): array
-    {
-        $authConfig = is_array($this->auth_config) ? $this->auth_config : [];
-
-        return [
-            ...$this->toFrontendArray(),
-            'authType' => $this->auth_type,
-            'authConfig' => [
-                'username' => $authConfig['username'] ?? '',
-                'password' => $authConfig['password'] ?? '',
-                'token' => $authConfig['token'] ?? '',
-                'apiKey' => $authConfig['api_key'] ?? '',
-                'headerName' => $authConfig['header_name'] ?? 'X-API-Key',
-            ],
-            'isActive' => $this->is_active,
-            'consecutiveFailures' => $this->consecutive_failures,
-        ];
-    }
-
-    /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
-            'auth_config' => 'encrypted:array',
-            'custom_headers' => 'array',
+            'auth_metadata' => 'array',
             'is_active' => 'boolean',
             'last_checked_at' => 'datetime',
         ];

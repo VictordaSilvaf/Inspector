@@ -1,5 +1,8 @@
 name: inspector-prod
 
+# Egress filtering for RFC1918 outbound HTTP must be enforced at the cloud
+# firewall/security-group level. Docker bridge networks alone do not block SSRF.
+
 x-app-common: &app-common
     build:
         context: .
@@ -12,7 +15,8 @@ x-app-common: &app-common
         - app_storage:/var/www/html/storage/app
         - app_logs:/var/www/html/storage/logs
     networks:
-        - inspector
+        - inspector_internal
+        - inspector_egress
 
 services:
     caddy:
@@ -29,7 +33,7 @@ services:
             - caddy_data:/data
             - caddy_config:/config
         networks:
-            - inspector
+            - inspector_egress
         depends_on:
             app:
                 condition: service_healthy
@@ -103,7 +107,7 @@ services:
         volumes:
             - pgsql_data:/var/lib/postgresql
         networks:
-            - inspector
+            - inspector_internal
         healthcheck:
             test:
                 - CMD
@@ -127,7 +131,7 @@ services:
         volumes:
             - redis_data:/data
         networks:
-            - inspector
+            - inspector_internal
         healthcheck:
             test:
                 - CMD
@@ -138,7 +142,9 @@ services:
             retries: 10
 
 networks:
-    inspector:
+    inspector_internal:
+        internal: true
+    inspector_egress:
         driver: bridge
 
 volumes:

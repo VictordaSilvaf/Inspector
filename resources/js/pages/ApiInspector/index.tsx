@@ -21,7 +21,13 @@ type ApiMonitorListItem = {
     httpMethod: string;
     intervalSeconds: ApiMonitorIntervalSeconds | number;
     expectedStatusCode: number;
-    customHeaders: Array<{ key: string; value: string }>;
+    customHeaders: Array<{
+        name: string;
+        configured: boolean;
+        isSensitive: boolean;
+        value?: string;
+    }>;
+    customHeaderCount: number;
     lastStatus: ApiStatusIndicatorStatus | null;
     lastResponseTimeMs: number | null;
     hasAuthentication: boolean;
@@ -222,22 +228,15 @@ export default function ApiInspectorIndex({
                                         : 'Não configurada'}
                                 </p>
 
-                                {monitor.customHeaders.length > 0 && (
+                                {monitor.customHeaderCount > 0 && (
                                     <>
                                         <p className="mt-2 text-sm text-ink-warm">
                                             Headers:
                                         </p>
                                         <p className="line-clamp-3 text-ink-muted">
-                                            {JSON.stringify(
-                                                Object.fromEntries(
-                                                    monitor.customHeaders.map(
-                                                        (header) => [
-                                                            header.key,
-                                                            header.value,
-                                                        ],
-                                                    ),
-                                                ),
-                                            )}
+                                            {monitor.customHeaders
+                                                .map((header) => header.name)
+                                                .join(', ')}
                                         </p>
                                     </>
                                 )}
