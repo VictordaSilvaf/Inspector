@@ -161,7 +161,7 @@ export default function ApiInspectorIndex({
                                 variants={cardVariants}
                                 className="card relative overflow-hidden"
                             >
-                                <h2 className="text-xl font-medium text-ink">
+                                <h2 className="text-xl font-medium text-ink mt-3">
                                     {monitor.name}
                                 </h2>
                                 <p className="mb-4 text-ink-muted">
