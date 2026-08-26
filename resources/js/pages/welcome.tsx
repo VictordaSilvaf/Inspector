@@ -8,36 +8,95 @@ import {
     useScroll,
     useTransform,
 } from 'motion/react';
+import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import { dashboard, login, register } from '@/routes';
 
 const storyItems = [
-    { label: 'Uptime', value: '99,98%', tone: 'ok' as const },
-    { label: 'Latência', value: '142ms', tone: 'warn' as const },
-    { label: 'Alertas', value: 'ao vivo', tone: 'hot' as const },
-    { label: 'APIs', value: '24/7', tone: 'ok' as const },
+    { label: 'APIs', value: 'várias' },
+    { label: 'Webhooks', value: 'ao vivo' },
+    { label: 'Alertas', value: 'custom' },
+    { label: 'Auth', value: 'segura' },
 ];
 
-const moments = [
+const apiChecks = [
+    { name: 'checkout-api', detail: 'GET · a cada 30s', ms: 128, ok: true },
+    { name: 'auth-service', detail: 'Bearer · a cada 10s', ms: 86, ok: true },
+    { name: 'billing-webhook', detail: 'Webhook · latência alta', ms: 942, ok: false },
+    { name: 'inventory-api', detail: 'API Key · a cada 60s', ms: 201, ok: true },
+];
+
+const authMethods = [
     {
-        title: 'Veja a saúde da API como um story',
-        body: 'Status, tempo de resposta e falhas consecutivas em um olhar — no ritmo do feed, não de uma planilha.',
+        name: 'Basic Auth',
+        body: 'Usuário e senha no padrão HTTP Basic — ideal para APIs internas e painéis legados.',
     },
     {
-        title: 'Alertas que chegam quando importa',
-        body: 'Queda, lentidão ou recuperação: o Inspector avisa no canal certo, sem ruído de dashboard.',
+        name: 'Bearer Token',
+        body: 'Envie JWT ou access token no header Authorization. O Inspector renova a checagem sem você abrir o Postman.',
     },
     {
-        title: 'Do endpoint ao histórico em segundos',
-        body: 'Cadastre a URL, escolha o intervalo e acompanhe cada checagem com contexto real de produção.',
+        name: 'API Key',
+        body: 'Chave em header customizável (ex.: X-API-Key). Você define o nome do header e o valor secreto.',
+    },
+    {
+        name: 'Headers extras',
+        body: 'Adicione pares chave/valor livres para tenants, versões de API ou assinaturas específicas do seu stack.',
     },
 ];
+
+const alertRules = [
+    {
+        title: 'Queda de status',
+        body: 'Dispare quando a API sair do 2xx/3xx — ou quando falhar N vezes seguidas, para filtrar ruído pontual.',
+    },
+    {
+        title: 'Latência acima do limite',
+        body: 'Defina um teto em milissegundos. Se a resposta passar disso, o alerta sobe antes do cliente sentir.',
+    },
+    {
+        title: 'Recuperação',
+        body: 'Além da queda, avise quando voltar ao normal — para fechar o incidente com o time alinhado.',
+    },
+    {
+        title: 'Canais verificados',
+        body: 'E-mails e canais passam por verificação. Você escolhe quem recebe cada tipo de alerta por monitor.',
+    },
+];
+
+function FadeIn({
+    children,
+    className,
+    delay = 0,
+}: {
+    children: ReactNode;
+    className?: string;
+    delay?: number;
+}) {
+    const reduceMotion = useReducedMotion();
+
+    return (
+        <motion.div
+            className={className}
+            initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{
+                delay,
+                duration: 0.6,
+                ease: [0.16, 1, 0.3, 1],
+            }}
+        >
+            {children}
+        </motion.div>
+    );
+}
 
 function StoryRing({
     children,
     delay = 0,
 }: {
-    children: React.ReactNode;
+    children: ReactNode;
     delay?: number;
 }) {
     const reduceMotion = useReducedMotion();
@@ -100,10 +159,10 @@ function PhoneStage() {
 
     return (
         <motion.div
-            className="relative mx-auto w-full max-w-[320px]"
+            className="relative mx-auto w-full max-w-[340px]"
             initial={reduceMotion ? false : { opacity: 0, y: 28 }}
             whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
+            viewport={{ once: true, amount: 0.35 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
             <div
@@ -116,19 +175,20 @@ function PhoneStage() {
             />
             <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#12100e] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
                 <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                    <p className="font-display text-sm font-semibold tracking-tight text-[#f7f2ec]">
-                        Inspector
-                    </p>
+                    <div>
+                        <p className="font-display text-sm font-semibold tracking-tight text-[#f7f2ec]">
+                            Seus monitores
+                        </p>
+                        <p className="text-[0.7rem] text-[#a89b90]">
+                            4 ativos · checagem contínua
+                        </p>
+                    </div>
                     <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[0.65rem] font-medium text-emerald-300">
-                        online
+                        ao vivo
                     </span>
                 </div>
-                <div className="space-y-3 px-5 pb-6">
-                    {[
-                        { name: 'checkout-api', ms: 128, ok: true },
-                        { name: 'auth-service', ms: 86, ok: true },
-                        { name: 'billing-webhook', ms: 942, ok: false },
-                    ].map((row, index) => (
+                <div className="space-y-2.5 px-5 pb-6">
+                    {apiChecks.map((row, index) => (
                         <motion.div
                             key={row.name}
                             className="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.04] px-3.5 py-3"
@@ -138,24 +198,24 @@ function PhoneStage() {
                             }
                             viewport={{ once: true }}
                             transition={{
-                                delay: 0.15 + index * 0.08,
+                                delay: 0.12 + index * 0.07,
                                 duration: 0.45,
                                 ease: [0.16, 1, 0.3, 1],
                             }}
                         >
-                            <div>
-                                <p className="text-sm font-medium text-[#f3ebe3]">
+                            <div className="min-w-0">
+                                <p className="truncate text-sm font-medium text-[#f3ebe3]">
                                     {row.name}
                                 </p>
-                                <p className="text-xs text-[#a89b90]">
-                                    {row.ok ? 'Resposta OK' : 'Tempo alto'}
+                                <p className="truncate text-xs text-[#a89b90]">
+                                    {row.detail}
                                 </p>
                             </div>
                             <p
                                 className={
                                     row.ok
-                                        ? 'font-display text-sm font-semibold text-emerald-300'
-                                        : 'font-display text-sm font-semibold text-[#ff8a4c]'
+                                        ? 'shrink-0 font-display text-sm font-semibold text-emerald-300'
+                                        : 'shrink-0 font-display text-sm font-semibold text-[#ff8a4c]'
                                 }
                             >
                                 <LiveMs value={row.ms} />
@@ -168,6 +228,35 @@ function PhoneStage() {
     );
 }
 
+function SectionNav() {
+    const links = [
+        { href: '#apis', label: 'APIs' },
+        { href: '#webhooks', label: 'Webhooks' },
+        { href: '#alertas', label: 'Alertas' },
+        { href: '#conexao', label: 'Conexão' },
+        { href: '#seguranca', label: 'Segurança' },
+    ];
+
+    return (
+        <nav
+            aria-label="Seções da página"
+            className="sticky top-0 z-30 border-b border-white/5 bg-[#0c0b0a]/85 backdrop-blur-md"
+        >
+            <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-5 py-2.5 sm:px-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {links.map((link) => (
+                    <a
+                        key={link.href}
+                        href={link.href}
+                        className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-[#b5a89c] transition hover:bg-white/5 hover:text-white"
+                    >
+                        {link.label}
+                    </a>
+                ))}
+            </div>
+        </nav>
+    );
+}
+
 export default function Welcome() {
     const { auth } = usePage().props;
     const reduceMotion = useReducedMotion();
@@ -176,16 +265,23 @@ export default function Welcome() {
         target: heroRef,
         offset: ['start start', 'end start'],
     });
-    const heroY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : 80]);
+    const heroY = useTransform(
+        scrollYProgress,
+        [0, 1],
+        [0, reduceMotion ? 0 : 80],
+    );
     const heroOpacity = useTransform(
         scrollYProgress,
         [0, 0.85],
         [1, reduceMotion ? 1 : 0.35],
     );
 
+    const primaryCta = auth.user ? dashboard() : register();
+    const primaryLabel = auth.user ? 'Abrir painel' : 'Criar conta grátis';
+
     return (
         <>
-            <Head title="Monitore suas APIs com clareza" />
+            <Head title="Monitore APIs, webhooks e alertas" />
 
             <div className="min-h-screen bg-[#0c0b0a] font-display text-[#f5f0ea] antialiased selection:bg-[#dd2a7b]/35 selection:text-white">
                 <a
@@ -195,7 +291,7 @@ export default function Welcome() {
                     Ir para o conteúdo
                 </a>
 
-                <header className="absolute inset-x-0 top-0 z-20">
+                <header className="absolute inset-x-0 top-0 z-40">
                     <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
                         <p className="text-lg font-semibold tracking-tight text-white">
                             Inspector
@@ -289,8 +385,9 @@ export default function Welcome() {
                                     delay: 0.12,
                                 }}
                             >
-                                Monitore APIs com a clareza de um feed — e a
-                                urgência de um alerta real.
+                                Monitore APIs e webhooks com alertas do seu
+                                jeito — em vários endpoints, com a autenticação
+                                que a sua stack já usa.
                             </motion.h1>
 
                             <motion.p
@@ -303,9 +400,10 @@ export default function Welcome() {
                                     delay: 0.18,
                                 }}
                             >
-                                Latência, status e falhas consecutivas em um só
-                                lugar. Receba avisos quando cair e quando
-                                voltar — sem caçar gráfico às 3 da manhã.
+                                Checagens contínuas, histórico de latência,
+                                falhas consecutivas e avisos de queda ou
+                                recuperação. Um painel para o time inteiro, sem
+                                planilha improvisada.
                             </motion.p>
 
                             <motion.div
@@ -319,97 +417,298 @@ export default function Welcome() {
                                 }}
                             >
                                 <Link
-                                    href={auth.user ? dashboard() : register()}
+                                    href={primaryCta}
                                     className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0c0b0a] transition hover:bg-[#f3ebe3]"
                                 >
-                                    {auth.user
-                                        ? 'Ir para o painel'
-                                        : 'Começar grátis'}
+                                    {primaryLabel}
                                 </Link>
                                 <a
-                                    href="#produto"
+                                    href="#apis"
                                     className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-[#f5f0ea] transition hover:border-white/40"
                                 >
-                                    Ver como funciona
+                                    Ver recursos
                                 </a>
                             </motion.div>
                         </motion.div>
                     </section>
+
+                    <SectionNav />
 
                     <section
                         id="produto"
                         className="relative border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
                     >
                         <div className="mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
-                            <div>
+                            <FadeIn>
                                 <h2 className="mb-4 max-w-lg text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
-                                    O produto na tela, não só no discurso
+                                    Vários monitores. Um único olhar.
                                 </h2>
-                                <p className="mb-8 max-w-md text-base leading-relaxed text-[#b5a89c]">
-                                    Cada checagem vira um quadro legível: verde
-                                    quando responde, destaque quando atrasa,
-                                    histórico quando você precisa explicar o
-                                    incidente.
+                                <p className="mb-6 max-w-md text-base leading-relaxed text-[#b5a89c]">
+                                    Cadastre quantos endpoints precisar —
+                                    checkout, auth, billing, inventário. Cada um
+                                    com frequência própria (10s, 30s ou 60s),
+                                    método HTTP e credenciais isoladas.
                                 </p>
-                                <ul className="space-y-4 text-sm text-[#d7cbc0]">
-                                    <li className="flex gap-3">
-                                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[#dd2a7b]" />
-                                        Intervalos flexíveis e checagens
-                                        contínuas
-                                    </li>
-                                    <li className="flex gap-3">
-                                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[#f58529]" />
-                                        Alertas por e-mail com recuperação
-                                        incluída
-                                    </li>
-                                    <li className="flex gap-3">
-                                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[#8134af]" />
-                                        Autenticação Bearer, API Key e headers
-                                        custom
-                                    </li>
-                                </ul>
-                            </div>
+                                <p className="max-w-md text-sm leading-relaxed text-[#d7cbc0]">
+                                    No feed você vê quem está saudável, quem
+                                    demorou e quem falhou em sequência. Ideal
+                                    para produtos com dezenas de dependências
+                                    externas.
+                                </p>
+                            </FadeIn>
                             <PhoneStage />
                         </div>
                     </section>
 
-                    <section className="border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28">
+                    <section
+                        id="apis"
+                        className="border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                    >
                         <div className="mx-auto max-w-6xl">
-                            <h2 className="mb-12 max-w-2xl text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
-                                Três momentos do dia a dia com o Inspector
-                            </h2>
-                            <div className="grid gap-10 md:grid-cols-3 md:gap-8">
-                                {moments.map((moment, index) => (
-                                    <motion.article
-                                        key={moment.title}
-                                        className="relative border-t border-white/15 pt-6"
-                                        initial={
-                                            reduceMotion
-                                                ? false
-                                                : { opacity: 0, y: 20 }
-                                        }
-                                        whileInView={
-                                            reduceMotion
-                                                ? undefined
-                                                : { opacity: 1, y: 0 }
-                                        }
-                                        viewport={{ once: true, amount: 0.35 }}
-                                        transition={{
-                                            delay: index * 0.08,
-                                            duration: 0.55,
-                                            ease: [0.16, 1, 0.3, 1],
-                                        }}
+                            <FadeIn className="mb-12 max-w-2xl">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                    Monitoramento de APIs de ponta a ponta
+                                </h2>
+                                <p className="text-base leading-relaxed text-[#b5a89c]">
+                                    O Inspector chama a sua URL nos intervalos
+                                    que você escolhe, registra status e tempo de
+                                    resposta e monta o histórico para auditoria
+                                    e post-mortem.
+                                </p>
+                            </FadeIn>
+                            <div className="grid gap-8 md:grid-cols-2">
+                                {[
+                                    {
+                                        title: 'Métodos HTTP reais',
+                                        body: 'GET, POST, PUT e DELETE — monitore leitura, escrita e exclusão como o cliente de verdade faria.',
+                                    },
+                                    {
+                                        title: 'Frequência sob controle',
+                                        body: 'A cada 10, 30 ou 60 segundos. Crítico sobe a cadência; serviços estáveis relaxam o ritmo.',
+                                    },
+                                    {
+                                        title: 'Status + latência',
+                                        body: 'Não basta “estar no ar”: se a API responde em 900ms, o Inspector marca e você age.',
+                                    },
+                                    {
+                                        title: 'Histórico por checagem',
+                                        body: 'Cada tentativa fica registrada. Compare horários, falhas consecutivas e recuperação com contexto.',
+                                    },
+                                ].map((item, index) => (
+                                    <FadeIn
+                                        key={item.title}
+                                        delay={index * 0.06}
+                                        className="border-t border-white/15 pt-6"
                                     >
-                                        <p className="mb-3 text-sm text-[#a89b90]">
-                                            {String(index + 1).padStart(2, '0')}
-                                        </p>
-                                        <h3 className="mb-3 text-xl font-semibold tracking-tight text-pretty text-white">
-                                            {moment.title}
+                                        <h3 className="mb-2 text-xl font-semibold tracking-tight text-white">
+                                            {item.title}
                                         </h3>
                                         <p className="text-sm leading-relaxed text-[#b5a89c]">
-                                            {moment.body}
+                                            {item.body}
                                         </p>
-                                    </motion.article>
+                                    </FadeIn>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section
+                        id="webhooks"
+                        className="relative overflow-hidden border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                    >
+                        <div
+                            aria-hidden
+                            className="absolute inset-0 opacity-80"
+                            style={{
+                                background:
+                                    'radial-gradient(ellipse 55% 60% at 85% 20%, rgba(245,133,41,0.14), transparent 55%)',
+                            }}
+                        />
+                        <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+                            <FadeIn>
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                    Webhooks sob vigilância
+                                </h2>
+                                <p className="mb-5 text-base leading-relaxed text-[#b5a89c]">
+                                    Gateways de pagamento, CRMs e filas avisam
+                                    por webhook — e quando o receptor falha, o
+                                    negócio some no silêncio. O Inspector trata
+                                    esses endpoints como monitores de primeira
+                                    classe.
+                                </p>
+                                <ul className="space-y-3 text-sm text-[#d7cbc0]">
+                                    <li className="flex gap-3">
+                                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#f58529]" />
+                                        Acompanhe disponibilidade do receptor
+                                        que seus provedores chamam
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#dd2a7b]" />
+                                        Combine com APIs REST no mesmo painel
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#8134af]" />
+                                        Alertas quando o canal de eventos
+                                        esquenta ou some
+                                    </li>
+                                </ul>
+                            </FadeIn>
+                            <FadeIn delay={0.1}>
+                                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+                                    <p className="mb-6 text-xs font-medium tracking-wide text-[#a89b90] uppercase">
+                                        Fluxo típico
+                                    </p>
+                                    <ol className="space-y-5">
+                                        {[
+                                            'Provedor dispara o webhook para a sua URL',
+                                            'Inspector verifica se o endpoint responde a tempo',
+                                            'Se falhar ou atrasar, o alerta sobe no canal certo',
+                                            'Quando recupera, o time recebe a confirmação',
+                                        ].map((step, index) => (
+                                            <li
+                                                key={step}
+                                                className="flex gap-4"
+                                            >
+                                                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white">
+                                                    {index + 1}
+                                                </span>
+                                                <p className="pt-1.5 text-sm leading-relaxed text-[#d7cbc0]">
+                                                    {step}
+                                                </p>
+                                            </li>
+                                        ))}
+                                    </ol>
+                                </div>
+                            </FadeIn>
+                        </div>
+                    </section>
+
+                    <section
+                        id="alertas"
+                        className="border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                    >
+                        <div className="mx-auto max-w-6xl">
+                            <FadeIn className="mb-12 max-w-2xl">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                    Alertas customizáveis por monitor
+                                </h2>
+                                <p className="text-base leading-relaxed text-[#b5a89c]">
+                                    Cada API pode ter regras próprias: o que
+                                    dispara, depois de quantas falhas e quem
+                                    recebe. Menos ruído, mais sinal.
+                                </p>
+                            </FadeIn>
+                            <div className="grid gap-8 sm:grid-cols-2">
+                                {alertRules.map((rule, index) => (
+                                    <FadeIn
+                                        key={rule.title}
+                                        delay={index * 0.05}
+                                        className="border-t border-white/15 pt-6"
+                                    >
+                                        <h3 className="mb-2 text-lg font-semibold text-white">
+                                            {rule.title}
+                                        </h3>
+                                        <p className="text-sm leading-relaxed text-[#b5a89c]">
+                                            {rule.body}
+                                        </p>
+                                    </FadeIn>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section
+                        id="conexao"
+                        className="border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                    >
+                        <div className="mx-auto max-w-6xl">
+                            <FadeIn className="mb-4 max-w-2xl">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                    Conecte do jeito que a API exige
+                                </h2>
+                                <p className="mb-10 text-base leading-relaxed text-[#b5a89c]">
+                                    Nem toda API é pública. O Inspector fala os
+                                    dialetos de autenticação mais comuns —
+                                    sem gambiarra de proxy local.
+                                </p>
+                            </FadeIn>
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                                {authMethods.map((method, index) => (
+                                    <FadeIn
+                                        key={method.name}
+                                        delay={index * 0.05}
+                                        className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+                                    >
+                                        <p className="mb-3 text-sm font-semibold text-white">
+                                            {method.name}
+                                        </p>
+                                        <p className="text-xs leading-relaxed text-[#b5a89c]">
+                                            {method.body}
+                                        </p>
+                                    </FadeIn>
+                                ))}
+                            </div>
+                            <FadeIn delay={0.15} className="mt-10 max-w-2xl">
+                                <p className="text-sm leading-relaxed text-[#d7cbc0]">
+                                    Combine autenticação com headers extras e o
+                                    verbo HTTP certo. Assim o monitor reflete o
+                                    contrato real da integração — não um ping
+                                    genérico sem credencial.
+                                </p>
+                            </FadeIn>
+                        </div>
+                    </section>
+
+                    <section
+                        id="seguranca"
+                        className="relative overflow-hidden border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                    >
+                        <div
+                            aria-hidden
+                            className="absolute inset-0"
+                            style={{
+                                background:
+                                    'radial-gradient(ellipse 50% 55% at 10% 80%, rgba(221,42,123,0.12), transparent 50%)',
+                            }}
+                        />
+                        <div className="relative mx-auto max-w-6xl">
+                            <FadeIn className="mb-12 max-w-2xl">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                    Segurança no acesso e nos canais
+                                </h2>
+                                <p className="text-base leading-relaxed text-[#b5a89c]">
+                                    Monitorar produção exige confiança. Conta,
+                                    sessão e notificações foram pensadas para
+                                    times que lidam com dados sensíveis.
+                                </p>
+                            </FadeIn>
+                            <div className="grid gap-8 md:grid-cols-3">
+                                {[
+                                    {
+                                        title: 'Conta protegida',
+                                        body: 'Login com e-mail verificado, senha com hash moderno e autenticação em dois fatores (2FA) com códigos de recuperação.',
+                                    },
+                                    {
+                                        title: 'Sessões criptografadas',
+                                        body: 'Sessão e cache em Redis com criptografia de sessão em produção — menos superfície exposta no app.',
+                                    },
+                                    {
+                                        title: 'Canais com prova de dono',
+                                        body: 'Antes de receber alerta, o e-mail/canal passa por verificação. Nada de notificar endereço errado por engano.',
+                                    },
+                                ].map((item, index) => (
+                                    <FadeIn
+                                        key={item.title}
+                                        delay={index * 0.07}
+                                        className="border-t border-white/15 pt-6"
+                                    >
+                                        <h3 className="mb-3 text-lg font-semibold text-white">
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-sm leading-relaxed text-[#b5a89c]">
+                                            {item.body}
+                                        </p>
+                                    </FadeIn>
                                 ))}
                             </div>
                         </div>
@@ -426,20 +725,21 @@ export default function Welcome() {
                         />
                         <div className="relative mx-auto flex max-w-3xl flex-col items-start gap-6 text-left sm:items-center sm:text-center">
                             <p className="font-display text-[clamp(2rem,5vw,3.25rem)] leading-tight font-semibold tracking-[-0.03em] text-balance text-white">
-                                Sua API no ar. Você no controle.
+                                APIs, webhooks e alertas — no mesmo Inspector
                             </p>
                             <p className="max-w-xl text-base leading-relaxed text-[#b5a89c]">
-                                Crie sua conta, conecte o primeiro endpoint e
-                                receba o próximo alerta antes do cliente
-                                reclamar.
+                                Crie a conta, cadastre o primeiro endpoint com
+                                a autenticação certa e configure quem avisa
+                                quando cair. Em minutos você deixa de adivinhar
+                                se a integração está no ar.
                             </p>
                             <Link
-                                href={auth.user ? dashboard() : register()}
+                                href={primaryCta}
                                 className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[#0c0b0a] transition hover:bg-[#f3ebe3]"
                             >
                                 {auth.user
                                     ? 'Continuar no painel'
-                                    : 'Criar minha conta'}
+                                    : 'Começar a monitorar'}
                             </Link>
                         </div>
                     </section>
@@ -451,8 +751,8 @@ export default function Welcome() {
                             Inspector
                         </p>
                         <p className="text-xs text-[#8f8378]">
-                            Monitoramento de APIs para times que não podem
-                            adivinhar.
+                            Monitoramento de APIs e webhooks para times que não
+                            podem adivinhar.
                         </p>
                     </div>
                 </footer>
