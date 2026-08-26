@@ -3,9 +3,11 @@
 namespace App\Http\Requests\ApiInspector;
 
 use App\Rules\SafeMonitorUrl;
+use App\Services\Security\MonitorSecretChangeDetector;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreApiMonitorRequest extends FormRequest
 {
@@ -14,6 +16,9 @@ class StoreApiMonitorRequest extends FormRequest
      */
     public function rules(): array
     {
+        $requiresSecretProtection = app(MonitorSecretChangeDetector::class)
+            ->storeRequiresSecretProtection($this);
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'url' => ['required', 'string', 'url', 'max:2048', 'regex:/^https?:\/\//i', new SafeMonitorUrl],
@@ -26,10 +31,48 @@ class StoreApiMonitorRequest extends FormRequest
             'auth_config.token' => ['required_if:auth_type,bearer', 'nullable', 'string', 'max:4096'],
             'auth_config.api_key' => ['required_if:auth_type,api_key', 'nullable', 'string', 'max:4096'],
             'auth_config.header_name' => ['required_if:auth_type,api_key', 'nullable', 'string', 'max:255'],
+            'current_password' => [
+                Rule::requiredIf($requiresSecretProtection),
+                'nullable',
+                'string',
+                'current_password',
+            ],
             'custom_headers' => ['nullable', 'array'],
             'custom_headers.*.key' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z0-9!#$%&\'*+.^_`|~-]+$/'],
             'custom_headers.*.value' => ['required', 'string', 'max:4096'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $user = $this->user();
+
+            if ($user === null) {
+                return;
+            }
+
+            $maxMonitors = (int) config('monitors.max_per_user', 25);
+
+            if ($user->apiMonitors()->count() >= $maxMonitors) {
+                $validator->errors()->add(
+                    'name',
+                    "Você atingiu o limite de {$maxMonitors} monitores.",
+                );
+            }
+
+            if (! app(MonitorSecretChangeDetector::class)->storeRequiresSecretProtection($this)) {
+                return;
+            }
+
+            if ((bool) config('monitors.require_two_factor_for_secrets', false)
+                && ! $user->hasEnabledTwoFactorAuthentication()) {
+                $validator->errors()->add(
+                    'auth_type',
+                    'Ative a autenticação em dois fatores em Segurança antes de configurar credenciais.',
+                );
+            }
+        });
     }
 
     /**
@@ -50,6 +93,8 @@ class StoreApiMonitorRequest extends FormRequest
             'auth_config.token.required_if' => 'Informe o token Bearer da API.',
             'auth_config.api_key.required_if' => 'Informe a API Key.',
             'auth_config.header_name.required_if' => 'Informe o nome do header da API Key.',
+            'current_password.required' => 'Confirme sua senha para alterar credenciais.',
+            'current_password.current_password' => 'A senha informada está incorreta.',
             'custom_headers.*.key.required' => 'Informe o nome do header.',
             'custom_headers.*.value.required' => 'Informe o valor do header.',
         ];

@@ -41,6 +41,7 @@ type StoreApiMonitorPayload = {
     auth_type: 'none' | 'basic' | 'bearer' | 'api_key';
     auth_config: Record<string, string> | null;
     custom_headers: Array<{ key: string; value?: string }> | null;
+    current_password?: string;
 };
 
 type ServerValidationErrors = Record<string, string>;
@@ -162,6 +163,7 @@ function mapServerErrors(errors: ServerValidationErrors): {
         intervalError: errors.interval_seconds ?? null,
         authErrors,
         customHeaderErrors,
+        currentPasswordError: errors.current_password ?? errors.rate_limit ?? null,
     };
 }
 
@@ -186,6 +188,38 @@ function mapServerCustomHeaders(
         isSensitive: header.isSensitive,
         isRotating: false,
     }));
+}
+
+function requiresCurrentPassword(
+    mode: 'create' | 'update',
+    needsAdditionalInformation: boolean,
+    isRotatingSecret: boolean,
+    initialValues: ApiMonitorFormInitialValues | undefined,
+    authMethod: ApiAuthMethod,
+): boolean {
+    if (mode === 'create') {
+        return needsAdditionalInformation;
+    }
+
+    if (initialValues === undefined) {
+        return false;
+    }
+
+    if (isRotatingSecret) {
+        return true;
+    }
+
+    if (!needsAdditionalInformation && initialValues.authType !== 'none') {
+        return true;
+    }
+
+    const nextAuthType = mapAuthMethodToAuthType(authMethod);
+
+    if (nextAuthType !== initialValues.authType) {
+        return initialValues.authType !== 'none' || nextAuthType !== 'none';
+    }
+
+    return false;
 }
 
 function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
@@ -217,6 +251,8 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         initialValues?.authConfig.headerName || DEFAULT_API_KEY_HEADER,
     );
     const [isRotatingSecret, setIsRotatingSecret] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [currentPasswordError, setCurrentPasswordError] = useState<string | null>(null);
     const [customHeaders, setCustomHeaders] = useState<CustomHeader[]>(() =>
         initialValues !== undefined
             ? mapServerCustomHeaders(initialValues.customHeaders)
@@ -241,6 +277,14 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         && (initialValues?.authConfig.configured
             || initialValues?.authConfig.hasPassword
             || false);
+
+    const requiresCredentialConfirmation = requiresCurrentPassword(
+        mode,
+        needsAdditionalInformation,
+        isRotatingSecret,
+        initialValues,
+        authMethod,
+    );
 
     const clearAuthFieldError = (field: keyof AuthFieldErrors): void => {
         if (authErrors[field] !== undefined) {
@@ -532,6 +576,9 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
             auth_config: authConfig,
             custom_headers:
                 payloadHeaders.length > 0 ? payloadHeaders : null,
+            ...(requiresCredentialConfirmation && currentPassword !== ''
+                ? { current_password: currentPassword }
+                : {}),
         };
     };
 
@@ -541,9 +588,16 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         setError(null);
         setAuthErrors({});
         setCustomHeaderErrors({});
+        setCurrentPasswordError(null);
 
         try {
             const payload = await buildPayload();
+
+            if (requiresCredentialConfirmation && currentPassword.trim() === '') {
+                setCurrentPasswordError('Confirme sua senha para alterar credenciais.');
+
+                return;
+            }
 
             setIsLoading(true);
 
@@ -556,6 +610,7 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
                         setError(mappedErrors.urlError);
                         setAuthErrors(mappedErrors.authErrors);
                         setCustomHeaderErrors(mappedErrors.customHeaderErrors);
+                        setCurrentPasswordError(mappedErrors.currentPasswordError);
                     },
                     onFinish: () => {
                         setIsLoading(false);
@@ -573,6 +628,7 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
                     setError(mappedErrors.urlError);
                     setAuthErrors(mappedErrors.authErrors);
                     setCustomHeaderErrors(mappedErrors.customHeaderErrors);
+                    setCurrentPasswordError(mappedErrors.currentPasswordError);
                 },
                 onFinish: () => {
                     setIsLoading(false);
@@ -649,6 +705,15 @@ function useClientApiProvider(options: UseClientApiProviderOptions = {}) {
         isRotatingSecret,
         startRotatingSecret,
         cancelRotatingSecret,
+        currentPassword,
+        setCurrentPassword: (value: string) => {
+            setCurrentPassword(value);
+            if (currentPasswordError !== null) {
+                setCurrentPasswordError(null);
+            }
+        },
+        currentPasswordError: currentPasswordError ?? pageErrors?.current_password ?? pageErrors?.rate_limit ?? null,
+        requiresCredentialConfirmation,
         mode,
     };
 }

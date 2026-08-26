@@ -33,5 +33,7 @@
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="MONITOR_SECRETS_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="/>
         <env name="MONITOR_URL_REQUIRE_DNS" value="false"/>
+        <env name="MONITOR_REQUIRE_2FA_FOR_SECRETS" value="false"/>
+        <env name="MONITOR_MAX_PER_USER" value="100"/>
     </php>
 </phpunit>

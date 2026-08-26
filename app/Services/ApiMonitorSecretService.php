@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ApiMonitor;
 use App\Models\User;
+use App\Services\Security\MonitorCredentialNotificationService;
 use App\Services\Security\MonitorSecretAuditService;
 use App\Services\Security\SecretManager;
 
@@ -43,6 +44,12 @@ final class ApiMonitorSecretService
             $actor,
             ['auth_type' => $monitor->auth_type],
         );
+
+        app(MonitorCredentialNotificationService::class)->notifyChanged(
+            $monitor,
+            $action,
+            $actor,
+        );
     }
 
     public function delete(ApiMonitor $monitor, ?User $actor = null): void
@@ -58,6 +65,12 @@ final class ApiMonitorSecretService
             MonitorSecretAuditService::ACTION_SECRET_DELETED,
             $actor,
             ['auth_type' => $monitor->auth_type],
+        );
+
+        app(MonitorCredentialNotificationService::class)->notifyChanged(
+            $monitor,
+            MonitorSecretAuditService::ACTION_SECRET_DELETED,
+            $actor,
         );
     }
 

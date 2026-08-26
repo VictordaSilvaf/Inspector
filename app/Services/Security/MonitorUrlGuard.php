@@ -137,7 +137,7 @@ final class MonitorUrlGuard
             return array_values(array_unique($resolvedIps));
         }
 
-        $fallbackIps = gethostbynames($host);
+        $fallbackIps = gethostbynamel($host);
 
         if ($fallbackIps === false) {
             return [];

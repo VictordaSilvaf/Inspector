@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiInspector\ApiMonitorController;
 use App\Http\Controllers\ApiInspector\MonitorAlertController;
+use App\Http\Controllers\ApiInspector\MonitorSecretAuditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
@@ -27,9 +28,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [ApiMonitorController::class, 'index'])->name('index');
         Route::get('status', [ApiMonitorController::class, 'status'])->name('status');
         Route::get('create', [ApiMonitorController::class, 'create'])->name('create');
-        Route::post('/', [ApiMonitorController::class, 'store'])->name('store');
+        Route::post('/', [ApiMonitorController::class, 'store'])
+            ->middleware('throttle.monitors:store')
+            ->name('store');
         Route::get('{api_monitor}/alerts', [MonitorAlertController::class, 'index'])
             ->name('alerts.index');
+        Route::get('{api_monitor}/audit', [MonitorSecretAuditController::class, 'index'])
+            ->name('audit.index');
         Route::post('{api_monitor}/alerts', [MonitorAlertController::class, 'store'])
             ->name('alerts.store');
         Route::delete('{api_monitor}/alerts/{monitor_alert}', [MonitorAlertController::class, 'destroy'])
@@ -38,7 +43,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('alerts.subscriptions.sync');
 
         Route::get('{api_monitor}', [ApiMonitorController::class, 'show'])->name('show');
-        Route::put('{api_monitor}', [ApiMonitorController::class, 'update'])->name('update');
+        Route::put('{api_monitor}', [ApiMonitorController::class, 'update'])
+            ->middleware('throttle.monitors:update')
+            ->name('update');
     });
 
     Route::prefix('webhook-inspector')->name('webhook-inspector.')->group(function () {

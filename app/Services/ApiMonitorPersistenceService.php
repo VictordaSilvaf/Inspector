@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Requests\ApiInspector\StoreApiMonitorRequest;
 use App\Http\Requests\ApiInspector\UpdateApiMonitorRequest;
 use App\Models\ApiMonitor;
+use App\Services\Security\MonitorCredentialNotificationService;
 use App\Services\Security\MonitorSecretAuditService;
 use Illuminate\Support\Facades\DB;
 
@@ -95,6 +96,14 @@ final class ApiMonitorPersistenceService
                         'to' => $authType,
                     ],
                 );
+
+                if ($previousAuthType !== 'none' || $authType !== 'none') {
+                    app(MonitorCredentialNotificationService::class)->notifyChanged(
+                        $monitor,
+                        MonitorSecretAuditService::ACTION_AUTH_TYPE_CHANGED,
+                        $actor,
+                    );
+                }
             }
 
             if ($authType === 'none') {

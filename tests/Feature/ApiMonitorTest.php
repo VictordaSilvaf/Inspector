@@ -316,6 +316,7 @@ test('authenticated users can update their api monitor', function () {
         'auth_config' => [
             'token' => 'updated-token',
         ],
+        'current_password' => 'password',
         'custom_headers' => [
             ['key' => 'Accept', 'value' => 'application/json'],
         ],
@@ -398,6 +399,7 @@ test('store api monitor persists secrets in dedicated table', function () {
         'auth_config' => [
             'token' => 'store-token',
         ],
+        'current_password' => 'password',
     ])->assertSessionHasNoErrors();
 
     $monitor = ApiMonitor::query()->first();

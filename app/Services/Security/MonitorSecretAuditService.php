@@ -38,5 +38,9 @@ final class MonitorSecretAuditService
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+
+        if ($action === self::ACTION_URL_BLOCKED) {
+            app(MonitorSecurityAlertService::class)->recordUrlBlockedForMonitor($monitor);
+        }
     }
 }

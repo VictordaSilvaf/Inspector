@@ -5,6 +5,7 @@ namespace App\Http\Requests\ApiInspector;
 use App\Models\ApiMonitor;
 use App\Rules\SafeMonitorUrl;
 use App\Services\ApiMonitorSecretService;
+use App\Services\Security\MonitorSecretChangeDetector;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -25,6 +26,10 @@ class UpdateApiMonitorRequest extends FormRequest
      */
     public function rules(): array
     {
+        $monitor = $this->route('api_monitor');
+        $requiresSecretProtection = $monitor instanceof ApiMonitor
+            && app(MonitorSecretChangeDetector::class)->updateRequiresSecretProtection($this, $monitor);
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'url' => ['required', 'string', 'url', 'max:2048', 'regex:/^https?:\/\//i', new SafeMonitorUrl],
@@ -37,6 +42,12 @@ class UpdateApiMonitorRequest extends FormRequest
             'auth_config.token' => ['nullable', 'string', 'max:4096'],
             'auth_config.api_key' => ['nullable', 'string', 'max:4096'],
             'auth_config.header_name' => ['required_if:auth_type,api_key', 'nullable', 'string', 'max:255'],
+            'current_password' => [
+                Rule::requiredIf($requiresSecretProtection),
+                'nullable',
+                'string',
+                'current_password',
+            ],
             'custom_headers' => ['nullable', 'array'],
             'custom_headers.*.key' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z0-9!#$%&\'*+.^_`|~-]+$/'],
             'custom_headers.*.value' => ['nullable', 'string', 'max:4096'],
@@ -62,6 +73,8 @@ class UpdateApiMonitorRequest extends FormRequest
             'auth_config.token.required' => 'Informe o token Bearer da API.',
             'auth_config.api_key.required' => 'Informe a API Key.',
             'auth_config.header_name.required_if' => 'Informe o nome do header da API Key.',
+            'current_password.required' => 'Confirme sua senha para alterar credenciais.',
+            'current_password.current_password' => 'A senha informada está incorreta.',
             'custom_headers.*.key.required' => 'Informe o nome do header.',
         ];
     }
@@ -73,6 +86,15 @@ class UpdateApiMonitorRequest extends FormRequest
 
             if (! $monitor instanceof ApiMonitor) {
                 return;
+            }
+
+            if (app(MonitorSecretChangeDetector::class)->updateRequiresSecretProtection($this, $monitor)
+                && (bool) config('monitors.require_two_factor_for_secrets', false)
+                && ! $this->user()?->hasEnabledTwoFactorAuthentication()) {
+                $validator->errors()->add(
+                    'auth_type',
+                    'Ative a autenticação em dois fatores em Segurança antes de alterar credenciais.',
+                );
             }
 
             $authType = (string) $this->input('auth_type', 'none');

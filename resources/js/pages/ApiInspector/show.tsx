@@ -1,10 +1,11 @@
 import { InfiniteScroll, router, usePoll } from '@inertiajs/react';
 import SeoHead from '@/components/seo-head';
-import { ArrowLeftIcon, BellIcon } from 'lucide-react';
+import { ArrowLeftIcon, BellIcon, HistoryIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Variants } from 'motion/react';
 import { index as apiInspectorIndex } from '@/routes/api-inspector';
 import { index as alertsIndex } from '@/routes/api-inspector/alerts';
+import { index as auditIndex } from '@/routes/api-inspector/audit';
 import { ApiConsulting } from '@/components/base/ApiConsulting';
 import type {
     ApiHttpMethod,
@@ -319,6 +320,16 @@ export default function ApiInspectorShow({
                             >
                                 <BellIcon className="size-4" />
                                 Gerenciar alertas
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="w-fit rounded-full border-hairline bg-transparent hover:bg-surface-strong"
+                                onClick={() =>
+                                    router.visit(auditIndex.url(monitor.id))
+                                }
+                            >
+                                <HistoryIcon className="size-4" />
+                                Auditoria de credenciais
                             </Button>
                         </div>
                         <motion.div

@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { ApiAuthentication } from '@/components/base/ApiConsulting/components/ApiAuthentication';
 import { ApiUrlMonitor } from '@/components/base/ApiConsulting/components/ApiUrlMonitor';
+import { CredentialConfirmationSection } from '@/components/base/ApiConsulting/components/CredentialConfirmationSection';
 import { CustomHeadersSection } from '@/components/base/ApiConsulting/components/CustomHeadersSection';
 import { MonitorIntervalSection } from '@/components/base/ApiConsulting/components/MonitorIntervalSection';
 import InputError from '@/components/input-error';
@@ -63,6 +64,10 @@ function ApiConsulting({
         cancelRotatingSecret,
         startRotatingCustomHeader,
         cancelRotatingCustomHeader,
+        currentPassword,
+        setCurrentPassword,
+        currentPasswordError,
+        requiresCredentialConfirmation,
     } = useClientApiProvider({
         initialValues,
         mode,
@@ -152,6 +157,15 @@ function ApiConsulting({
                 onAddAuthentication={addAuthentication}
                 onRemoveAuthentication={removeAuthentication}
             />
+
+            {requiresCredentialConfirmation && (
+                <CredentialConfirmationSection
+                    currentPassword={currentPassword}
+                    currentPasswordError={currentPasswordError}
+                    isLoading={isLoading}
+                    onCurrentPasswordChange={setCurrentPassword}
+                />
+            )}
 
             <CustomHeadersSection
                 customHeaders={customHeaders}

@@ -107,6 +107,14 @@ class ApiMonitor extends Model
         return $this->hasMany(ApiMonitorHeader::class);
     }
 
+    /**
+     * @return HasMany<ApiMonitorSecretAudit, $this>
+     */
+    public function secretAudits(): HasMany
+    {
+        return $this->hasMany(ApiMonitorSecretAudit::class);
+    }
+
     public function isDueForCheck(): bool
     {
         if (! $this->is_active) {

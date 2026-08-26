@@ -23,6 +23,7 @@ test('creating monitor with bearer auth records secret created audit', function 
         'auth_config' => [
             'token' => 'super-secret-token',
         ],
+        'current_password' => 'password',
     ])->assertSessionHasNoErrors();
 
     $monitor = ApiMonitor::query()->first();
@@ -54,6 +55,7 @@ test('rotating monitor secret records secret rotated audit', function () {
         'auth_config' => [
             'token' => 'new-token',
         ],
+        'current_password' => 'password',
     ])->assertSessionHasNoErrors();
 
     expect(
@@ -75,6 +77,7 @@ test('removing authentication records secret deleted and auth type changed audit
         'http_method' => $monitor->http_method,
         'interval_seconds' => $monitor->interval_seconds,
         'auth_type' => 'none',
+        'current_password' => 'password',
     ])->assertSessionHasNoErrors();
 
     expect(
