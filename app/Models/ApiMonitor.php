@@ -83,6 +83,14 @@ class ApiMonitor extends Model
         return $this->hasMany(ApiMonitorCheck::class);
     }
 
+    /**
+     * @return HasMany<MonitorAlert, $this>
+     */
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(MonitorAlert::class);
+    }
+
     public function isDueForCheck(): bool
     {
         if (! $this->is_active) {

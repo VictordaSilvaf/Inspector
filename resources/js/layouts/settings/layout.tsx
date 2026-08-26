@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import { edit as editAppearance } from '@/routes/appearance';
+import { index as notificationChannelsIndex } from '@/routes/notification-channels';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import Heading from '@/components/heading';
@@ -24,6 +25,11 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Appearance',
         href: editAppearance(),
+        icon: null,
+    },
+    {
+        title: 'Notificações',
+        href: notificationChannelsIndex(),
         icon: null,
     },
 ];

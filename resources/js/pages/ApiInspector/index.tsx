@@ -3,6 +3,7 @@ import { EyeIcon, PlusIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Variants } from 'motion/react';
 import { create, index as apiInspectorIndex, show } from '@/routes/api-inspector';
+import { index as alertsIndex } from '@/routes/api-inspector/alerts';
 import { API_MONITOR_INTERVAL_LABELS } from '@/components/base/ApiConsulting/auth';
 import type { ApiMonitorIntervalSeconds } from '@/components/base/ApiConsulting/auth';
 import { Button } from '@/components/ui/button';
@@ -241,7 +242,9 @@ export default function ApiInspectorIndex({
                                         variant="outline"
                                         className="flex w-full cursor-pointer flex-row"
                                         onClick={() =>
-                                            router.visit(show(monitor.id))
+                                            router.visit(
+                                                alertsIndex.url(monitor.id),
+                                            )
                                         }
                                     >
                                         <PlusIcon className="h-4 w-4" />

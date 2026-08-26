@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ApiMonitor;
 use App\Models\ApiMonitorCheck;
+use App\Services\Alerts\MonitorAlertEvaluator;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Throwable;
@@ -13,6 +14,10 @@ class ApiMonitorChecker
     private const int SlowResponseThresholdMs = 500;
 
     private const int BodyPreviewLimit = 500;
+
+    public function __construct(
+        private MonitorAlertEvaluator $alertEvaluator,
+    ) {}
 
     public function check(ApiMonitor $monitor, string $triggeredBy = 'manual'): ApiMonitorCheck
     {
@@ -54,12 +59,19 @@ class ApiMonitorChecker
             ]);
 
             $this->syncMonitorSummary($monitor, $check);
+            $this->evaluateAlerts($monitor, $check);
 
             return $check;
         } catch (ConnectionException $exception) {
-            return $this->recordFailure($monitor, $triggeredBy, $exception->getMessage());
+            $check = $this->recordFailure($monitor, $triggeredBy, $exception->getMessage());
+            $this->evaluateAlerts($monitor, $check);
+
+            return $check;
         } catch (Throwable $exception) {
-            return $this->recordFailure($monitor, $triggeredBy, 'Não foi possível consultar o endereço da API.');
+            $check = $this->recordFailure($monitor, $triggeredBy, 'Não foi possível consultar o endereço da API.');
+            $this->evaluateAlerts($monitor, $check);
+
+            return $check;
         }
     }
 
@@ -180,5 +192,14 @@ class ApiMonitorChecker
             'last_checked_at' => $check->checked_at,
             'consecutive_failures' => $consecutiveFailures,
         ]);
+    }
+
+    private function evaluateAlerts(ApiMonitor $monitor, ApiMonitorCheck $check): void
+    {
+        try {
+            $this->alertEvaluator->evaluate($monitor->fresh() ?? $monitor, $check);
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 }

@@ -1,8 +1,9 @@
 import { Head, InfiniteScroll, router, usePoll } from '@inertiajs/react';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, BellIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Variants } from 'motion/react';
 import { index as apiInspectorIndex } from '@/routes/api-inspector';
+import { index as alertsIndex } from '@/routes/api-inspector/alerts';
 import { ApiConsulting } from '@/components/base/ApiConsulting';
 import type {
     ApiHttpMethod,
@@ -297,14 +298,28 @@ export default function ApiInspectorShow({
                     animate="visible"
                 >
                     <div className="flex flex-col gap-3">
-                        <Button
-                            variant="ghost"
-                            className="w-fit px-0"
-                            onClick={() => router.visit(apiInspectorIndex())}
-                        >
-                            <ArrowLeftIcon className="size-4" />
-                            Voltar para listagem
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                variant="ghost"
+                                className="w-fit px-0"
+                                onClick={() =>
+                                    router.visit(apiInspectorIndex())
+                                }
+                            >
+                                <ArrowLeftIcon className="size-4" />
+                                Voltar para listagem
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="w-fit"
+                                onClick={() =>
+                                    router.visit(alertsIndex.url(monitor.id))
+                                }
+                            >
+                                <BellIcon className="size-4" />
+                                Gerenciar alertas
+                            </Button>
+                        </div>
                         <motion.div
                             className="relative max-w-3xl overflow-hidden rounded-xl border-2 border-border p-5"
                             initial={{ opacity: 0, x: -12 }}
