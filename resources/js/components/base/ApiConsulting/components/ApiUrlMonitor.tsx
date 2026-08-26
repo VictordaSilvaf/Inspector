@@ -47,7 +47,7 @@ function ApiUrlMonitor({
                     Informe a URL da API que deseja monitorar e o método HTTP que deseja utilizar.
                 </p>
             </div>
-            <div className="mt-4 mb-5 grid grid-cols-1 items-start gap-8 sm:flex sm:flex-row sm:items-center sm:gap-5">
+            <div className="mt-4 mb-5 grid grid-cols-1 items-start gap-5">
                 <div className="relative flex flex-1 flex-row gap-2">
                     <Select
                         value={httpMethod}

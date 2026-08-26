@@ -10,6 +10,7 @@ import {
 } from 'motion/react';
 import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
+import AppearanceToggle from '@/components/appearance-toggle';
 import { dashboard, login, register } from '@/routes';
 
 const storyItems = [
@@ -121,8 +122,8 @@ function StoryRing({
                           }
                 }
             />
-            <div className="absolute inset-[3px] flex items-center justify-center rounded-full bg-[#0c0b0a] p-[3px]">
-                <div className="flex size-full items-center justify-center rounded-full bg-[#161412] text-center text-[0.65rem] font-semibold leading-tight text-[#f5f0ea] sm:text-xs">
+            <div className="absolute inset-[3px] flex items-center justify-center rounded-full bg-canvas p-[3px]">
+                <div className="flex size-full items-center justify-center rounded-full bg-elevated text-center text-[0.65rem] font-semibold leading-tight text-ink sm:text-xs">
                     <span className="px-1">{children}</span>
                 </div>
             </div>
@@ -173,13 +174,13 @@ function PhoneStage() {
                         'radial-gradient(circle at 50% 30%, rgba(221,42,123,0.35), transparent 55%), radial-gradient(circle at 70% 70%, rgba(245,133,41,0.28), transparent 50%)',
                 }}
             />
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#12100e] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
+            <div className="relative overflow-hidden rounded-[2rem] border border-hairline bg-elevated shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
                 <div className="flex items-center justify-between px-5 pt-5 pb-3">
                     <div>
-                        <p className="font-display text-sm font-semibold tracking-tight text-[#f7f2ec]">
+                        <p className="font-display text-sm font-semibold tracking-tight text-ink">
                             Seus monitores
                         </p>
-                        <p className="text-[0.7rem] text-[#a89b90]">
+                        <p className="text-[0.7rem] text-ink-soft">
                             4 ativos · checagem contínua
                         </p>
                     </div>
@@ -191,7 +192,7 @@ function PhoneStage() {
                     {apiChecks.map((row, index) => (
                         <motion.div
                             key={row.name}
-                            className="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.04] px-3.5 py-3"
+                            className="flex items-center justify-between gap-3 rounded-2xl bg-surface px-3.5 py-3"
                             initial={reduceMotion ? false : { opacity: 0, x: 12 }}
                             whileInView={
                                 reduceMotion ? undefined : { opacity: 1, x: 0 }
@@ -204,10 +205,10 @@ function PhoneStage() {
                             }}
                         >
                             <div className="min-w-0">
-                                <p className="truncate text-sm font-medium text-[#f3ebe3]">
+                                <p className="truncate text-sm font-medium text-ink-warm">
                                     {row.name}
                                 </p>
-                                <p className="truncate text-xs text-[#a89b90]">
+                                <p className="truncate text-xs text-ink-soft">
                                     {row.detail}
                                 </p>
                             </div>
@@ -215,7 +216,7 @@ function PhoneStage() {
                                 className={
                                     row.ok
                                         ? 'shrink-0 font-display text-sm font-semibold text-emerald-300'
-                                        : 'shrink-0 font-display text-sm font-semibold text-[#ff8a4c]'
+                                        : 'shrink-0 font-display text-sm font-semibold text-brand-warm'
                                 }
                             >
                                 <LiveMs value={row.ms} />
@@ -240,14 +241,14 @@ function SectionNav() {
     return (
         <nav
             aria-label="Seções da página"
-            className="sticky top-0 z-30 border-b border-white/5 bg-[#0c0b0a]/85 backdrop-blur-md"
+            className="sticky top-0 z-30 border-b border-hairline bg-canvas/85 backdrop-blur-md"
         >
             <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-5 py-2.5 sm:px-8 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {links.map((link) => (
                     <a
                         key={link.href}
                         href={link.href}
-                        className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-[#b5a89c] transition hover:bg-white/5 hover:text-white"
+                        className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:bg-surface-strong hover:text-ink"
                     >
                         {link.label}
                     </a>
@@ -283,7 +284,7 @@ export default function Welcome() {
         <>
             <Head title="Monitore APIs, webhooks e alertas" />
 
-            <div className="min-h-screen bg-[#0c0b0a] font-display text-[#f5f0ea] antialiased selection:bg-[#dd2a7b]/35 selection:text-white">
+            <div className="min-h-screen bg-canvas font-display text-ink antialiased selection:bg-brand/35 selection:text-white">
                 <a
                     href="#conteudo"
                     className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-black"
@@ -293,14 +294,15 @@ export default function Welcome() {
 
                 <header className="absolute inset-x-0 top-0 z-40">
                     <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
-                        <p className="text-lg font-semibold tracking-tight text-white">
+                        <p className="text-lg font-semibold tracking-tight text-ink">
                             Inspector
                         </p>
                         <nav className="flex items-center gap-2 sm:gap-3">
+                            <AppearanceToggle />
                             {auth.user ? (
                                 <Link
                                     href={dashboard()}
-                                    className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0c0b0a] transition hover:bg-[#f3ebe3]"
+                                    className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-canvas transition hover:opacity-90"
                                 >
                                     Abrir painel
                                 </Link>
@@ -308,13 +310,13 @@ export default function Welcome() {
                                 <>
                                     <Link
                                         href={login()}
-                                        className="rounded-full px-3 py-2 text-sm font-medium text-[#f5f0ea]/80 transition hover:text-white"
+                                        className="rounded-full px-3 py-2 text-sm font-medium text-ink/80 transition hover:text-ink"
                                     >
                                         Entrar
                                     </Link>
                                     <Link
                                         href={register()}
-                                        className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#0c0b0a] transition hover:bg-[#f3ebe3]"
+                                        className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-canvas transition hover:opacity-90"
                                     >
                                         Criar conta
                                     </Link>
@@ -334,7 +336,7 @@ export default function Welcome() {
                             className="absolute inset-0"
                             style={{
                                 background:
-                                    'radial-gradient(ellipse 90% 70% at 50% -10%, rgba(221,42,123,0.28), transparent 55%), radial-gradient(ellipse 60% 50% at 100% 40%, rgba(245,133,41,0.18), transparent 50%), linear-gradient(180deg, #120f0d 0%, #0c0b0a 55%, #0c0b0a 100%)',
+                                    'var(--auth-glow)',
                             }}
                         />
                         <motion.div
@@ -355,7 +357,7 @@ export default function Welcome() {
                                         <StoryRing delay={index * 0.4}>
                                             {item.value}
                                         </StoryRing>
-                                        <span className="text-[0.7rem] text-[#b5a89c]">
+                                        <span className="text-[0.7rem] text-ink-muted">
                                             {item.label}
                                         </span>
                                     </div>
@@ -363,7 +365,7 @@ export default function Welcome() {
                             </motion.div>
 
                             <motion.p
-                                className="mb-4 max-w-3xl font-display text-[clamp(2.75rem,9vw,5.5rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-balance text-white"
+                                className="mb-4 max-w-3xl font-display text-[clamp(2.75rem,9vw,5.5rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-balance text-ink"
                                 initial={reduceMotion ? false : { opacity: 0, y: 24 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{
@@ -376,7 +378,7 @@ export default function Welcome() {
                             </motion.p>
 
                             <motion.h1
-                                className="mb-5 max-w-2xl text-[clamp(1.35rem,3.4vw,2rem)] leading-snug font-medium text-pretty text-[#f3ebe3]"
+                                className="mb-5 max-w-2xl text-[clamp(1.35rem,3.4vw,2rem)] leading-snug font-medium text-pretty text-ink-warm"
                                 initial={reduceMotion ? false : { opacity: 0, y: 18 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{
@@ -391,7 +393,7 @@ export default function Welcome() {
                             </motion.h1>
 
                             <motion.p
-                                className="mb-8 max-w-xl text-base leading-relaxed text-[#b5a89c] sm:text-lg"
+                                className="mb-8 max-w-xl text-base leading-relaxed text-ink-muted sm:text-lg"
                                 initial={reduceMotion ? false : { opacity: 0, y: 14 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{
@@ -418,13 +420,13 @@ export default function Welcome() {
                             >
                                 <Link
                                     href={primaryCta}
-                                    className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0c0b0a] transition hover:bg-[#f3ebe3]"
+                                    className="inline-flex items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-semibold text-canvas transition hover:opacity-90"
                                 >
                                     {primaryLabel}
                                 </Link>
                                 <a
                                     href="#apis"
-                                    className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-[#f5f0ea] transition hover:border-white/40"
+                                    className="inline-flex items-center justify-center rounded-full border border-hairline px-6 py-3 text-sm font-medium text-ink transition hover:border-ink/30"
                                 >
                                     Ver recursos
                                 </a>
@@ -436,20 +438,20 @@ export default function Welcome() {
 
                     <section
                         id="produto"
-                        className="relative border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                        className="relative border-t border-hairline px-5 py-20 sm:px-8 sm:py-28"
                     >
                         <div className="mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
                             <FadeIn>
-                                <h2 className="mb-4 max-w-lg text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                <h2 className="mb-4 max-w-lg text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-ink">
                                     Vários monitores. Um único olhar.
                                 </h2>
-                                <p className="mb-6 max-w-md text-base leading-relaxed text-[#b5a89c]">
+                                <p className="mb-6 max-w-md text-base leading-relaxed text-ink-muted">
                                     Cadastre quantos endpoints precisar —
                                     checkout, auth, billing, inventário. Cada um
                                     com frequência própria (10s, 30s ou 60s),
                                     método HTTP e credenciais isoladas.
                                 </p>
-                                <p className="max-w-md text-sm leading-relaxed text-[#d7cbc0]">
+                                <p className="max-w-md text-sm leading-relaxed text-ink-muted">
                                     No feed você vê quem está saudável, quem
                                     demorou e quem falhou em sequência. Ideal
                                     para produtos com dezenas de dependências
@@ -462,14 +464,14 @@ export default function Welcome() {
 
                     <section
                         id="apis"
-                        className="border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                        className="border-t border-hairline px-5 py-20 sm:px-8 sm:py-28"
                     >
                         <div className="mx-auto max-w-6xl">
                             <FadeIn className="mb-12 max-w-2xl">
-                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-ink">
                                     Monitoramento de APIs de ponta a ponta
                                 </h2>
-                                <p className="text-base leading-relaxed text-[#b5a89c]">
+                                <p className="text-base leading-relaxed text-ink-muted">
                                     O Inspector chama a sua URL nos intervalos
                                     que você escolhe, registra status e tempo de
                                     resposta e monta o histórico para auditoria
@@ -498,12 +500,12 @@ export default function Welcome() {
                                     <FadeIn
                                         key={item.title}
                                         delay={index * 0.06}
-                                        className="border-t border-white/15 pt-6"
+                                        className="border-t border-hairline pt-6"
                                     >
-                                        <h3 className="mb-2 text-xl font-semibold tracking-tight text-white">
+                                        <h3 className="mb-2 text-xl font-semibold tracking-tight text-ink">
                                             {item.title}
                                         </h3>
-                                        <p className="text-sm leading-relaxed text-[#b5a89c]">
+                                        <p className="text-sm leading-relaxed text-ink-muted">
                                             {item.body}
                                         </p>
                                     </FadeIn>
@@ -514,7 +516,7 @@ export default function Welcome() {
 
                     <section
                         id="webhooks"
-                        className="relative overflow-hidden border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                        className="relative overflow-hidden border-t border-hairline px-5 py-20 sm:px-8 sm:py-28"
                     >
                         <div
                             aria-hidden
@@ -526,24 +528,24 @@ export default function Welcome() {
                         />
                         <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
                             <FadeIn>
-                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-ink">
                                     Webhooks sob vigilância
                                 </h2>
-                                <p className="mb-5 text-base leading-relaxed text-[#b5a89c]">
+                                <p className="mb-5 text-base leading-relaxed text-ink-muted">
                                     Gateways de pagamento, CRMs e filas avisam
                                     por webhook — e quando o receptor falha, o
                                     negócio some no silêncio. O Inspector trata
                                     esses endpoints como monitores de primeira
                                     classe.
                                 </p>
-                                <ul className="space-y-3 text-sm text-[#d7cbc0]">
+                                <ul className="space-y-3 text-sm text-ink-muted">
                                     <li className="flex gap-3">
-                                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#f58529]" />
+                                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-warm" />
                                         Acompanhe disponibilidade do receptor
                                         que seus provedores chamam
                                     </li>
                                     <li className="flex gap-3">
-                                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#dd2a7b]" />
+                                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
                                         Combine com APIs REST no mesmo painel
                                     </li>
                                     <li className="flex gap-3">
@@ -554,8 +556,8 @@ export default function Welcome() {
                                 </ul>
                             </FadeIn>
                             <FadeIn delay={0.1}>
-                                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-                                    <p className="mb-6 text-xs font-medium tracking-wide text-[#a89b90] uppercase">
+                                <div className="rounded-[1.5rem] border border-hairline bg-surface p-6 sm:p-8">
+                                    <p className="mb-6 text-xs font-medium tracking-wide text-ink-soft uppercase">
                                         Fluxo típico
                                     </p>
                                     <ol className="space-y-5">
@@ -569,10 +571,10 @@ export default function Welcome() {
                                                 key={step}
                                                 className="flex gap-4"
                                             >
-                                                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white">
+                                                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-strong text-xs font-semibold text-ink">
                                                     {index + 1}
                                                 </span>
-                                                <p className="pt-1.5 text-sm leading-relaxed text-[#d7cbc0]">
+                                                <p className="pt-1.5 text-sm leading-relaxed text-ink-muted">
                                                     {step}
                                                 </p>
                                             </li>
@@ -585,14 +587,14 @@ export default function Welcome() {
 
                     <section
                         id="alertas"
-                        className="border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                        className="border-t border-hairline px-5 py-20 sm:px-8 sm:py-28"
                     >
                         <div className="mx-auto max-w-6xl">
                             <FadeIn className="mb-12 max-w-2xl">
-                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-ink">
                                     Alertas customizáveis por monitor
                                 </h2>
-                                <p className="text-base leading-relaxed text-[#b5a89c]">
+                                <p className="text-base leading-relaxed text-ink-muted">
                                     Cada API pode ter regras próprias: o que
                                     dispara, depois de quantas falhas e quem
                                     recebe. Menos ruído, mais sinal.
@@ -603,12 +605,12 @@ export default function Welcome() {
                                     <FadeIn
                                         key={rule.title}
                                         delay={index * 0.05}
-                                        className="border-t border-white/15 pt-6"
+                                        className="border-t border-hairline pt-6"
                                     >
-                                        <h3 className="mb-2 text-lg font-semibold text-white">
+                                        <h3 className="mb-2 text-lg font-semibold text-ink">
                                             {rule.title}
                                         </h3>
-                                        <p className="text-sm leading-relaxed text-[#b5a89c]">
+                                        <p className="text-sm leading-relaxed text-ink-muted">
                                             {rule.body}
                                         </p>
                                     </FadeIn>
@@ -619,14 +621,14 @@ export default function Welcome() {
 
                     <section
                         id="conexao"
-                        className="border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                        className="border-t border-hairline px-5 py-20 sm:px-8 sm:py-28"
                     >
                         <div className="mx-auto max-w-6xl">
                             <FadeIn className="mb-4 max-w-2xl">
-                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-ink">
                                     Conecte do jeito que a API exige
                                 </h2>
-                                <p className="mb-10 text-base leading-relaxed text-[#b5a89c]">
+                                <p className="mb-10 text-base leading-relaxed text-ink-muted">
                                     Nem toda API é pública. O Inspector fala os
                                     dialetos de autenticação mais comuns —
                                     sem gambiarra de proxy local.
@@ -637,19 +639,19 @@ export default function Welcome() {
                                     <FadeIn
                                         key={method.name}
                                         delay={index * 0.05}
-                                        className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+                                        className="rounded-2xl border border-hairline bg-surface p-5"
                                     >
-                                        <p className="mb-3 text-sm font-semibold text-white">
+                                        <p className="mb-3 text-sm font-semibold text-ink">
                                             {method.name}
                                         </p>
-                                        <p className="text-xs leading-relaxed text-[#b5a89c]">
+                                        <p className="text-xs leading-relaxed text-ink-muted">
                                             {method.body}
                                         </p>
                                     </FadeIn>
                                 ))}
                             </div>
                             <FadeIn delay={0.15} className="mt-10 max-w-2xl">
-                                <p className="text-sm leading-relaxed text-[#d7cbc0]">
+                                <p className="text-sm leading-relaxed text-ink-muted">
                                     Combine autenticação com headers extras e o
                                     verbo HTTP certo. Assim o monitor reflete o
                                     contrato real da integração — não um ping
@@ -661,7 +663,7 @@ export default function Welcome() {
 
                     <section
                         id="seguranca"
-                        className="relative overflow-hidden border-t border-white/5 px-5 py-20 sm:px-8 sm:py-28"
+                        className="relative overflow-hidden border-t border-hairline px-5 py-20 sm:px-8 sm:py-28"
                     >
                         <div
                             aria-hidden
@@ -673,10 +675,10 @@ export default function Welcome() {
                         />
                         <div className="relative mx-auto max-w-6xl">
                             <FadeIn className="mb-12 max-w-2xl">
-                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-white">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-ink">
                                     Segurança no acesso e nos canais
                                 </h2>
-                                <p className="text-base leading-relaxed text-[#b5a89c]">
+                                <p className="text-base leading-relaxed text-ink-muted">
                                     Monitorar produção exige confiança. Conta,
                                     sessão e notificações foram pensadas para
                                     times que lidam com dados sensíveis.
@@ -700,12 +702,12 @@ export default function Welcome() {
                                     <FadeIn
                                         key={item.title}
                                         delay={index * 0.07}
-                                        className="border-t border-white/15 pt-6"
+                                        className="border-t border-hairline pt-6"
                                     >
-                                        <h3 className="mb-3 text-lg font-semibold text-white">
+                                        <h3 className="mb-3 text-lg font-semibold text-ink">
                                             {item.title}
                                         </h3>
-                                        <p className="text-sm leading-relaxed text-[#b5a89c]">
+                                        <p className="text-sm leading-relaxed text-ink-muted">
                                             {item.body}
                                         </p>
                                     </FadeIn>
@@ -714,7 +716,7 @@ export default function Welcome() {
                         </div>
                     </section>
 
-                    <section className="relative overflow-hidden border-t border-white/5 px-5 py-24 sm:px-8 sm:py-32">
+                    <section className="relative overflow-hidden border-t border-hairline px-5 py-24 sm:px-8 sm:py-32">
                         <div
                             aria-hidden
                             className="absolute inset-0 opacity-90"
@@ -724,10 +726,10 @@ export default function Welcome() {
                             }}
                         />
                         <div className="relative mx-auto flex max-w-3xl flex-col items-start gap-6 text-left sm:items-center sm:text-center">
-                            <p className="font-display text-[clamp(2rem,5vw,3.25rem)] leading-tight font-semibold tracking-[-0.03em] text-balance text-white">
+                            <p className="font-display text-[clamp(2rem,5vw,3.25rem)] leading-tight font-semibold tracking-[-0.03em] text-balance text-ink">
                                 APIs, webhooks e alertas — no mesmo Inspector
                             </p>
-                            <p className="max-w-xl text-base leading-relaxed text-[#b5a89c]">
+                            <p className="max-w-xl text-base leading-relaxed text-ink-muted">
                                 Crie a conta, cadastre o primeiro endpoint com
                                 a autenticação certa e configure quem avisa
                                 quando cair. Em minutos você deixa de adivinhar
@@ -735,7 +737,7 @@ export default function Welcome() {
                             </p>
                             <Link
                                 href={primaryCta}
-                                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[#0c0b0a] transition hover:bg-[#f3ebe3]"
+                                className="inline-flex items-center justify-center rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-canvas transition hover:opacity-90"
                             >
                                 {auth.user
                                     ? 'Continuar no painel'
@@ -745,12 +747,12 @@ export default function Welcome() {
                     </section>
                 </main>
 
-                <footer className="border-t border-white/5 px-5 py-8 sm:px-8">
+                <footer className="border-t border-hairline px-5 py-8 sm:px-8">
                     <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <p className="text-sm font-medium text-[#f5f0ea]/80">
+                        <p className="text-sm font-medium text-ink/80">
                             Inspector
                         </p>
-                        <p className="text-xs text-[#8f8378]">
+                        <p className="text-xs text-ink-soft">
                             Monitoramento de APIs e webhooks para times que não
                             podem adivinhar.
                         </p>

@@ -1,6 +1,5 @@
 import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
-import { edit as editAppearance } from '@/routes/appearance';
 import { index as notificationChannelsIndex } from '@/routes/notification-channels';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
@@ -18,11 +17,6 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Segurança',
         href: editSecurity(),
-        icon: null,
-    },
-    {
-        title: 'Aparência',
-        href: editAppearance(),
         icon: null,
     },
     {
@@ -58,8 +52,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                     className={cn(
                                         'rounded-full px-3 py-1.5 text-sm transition',
                                         active
-                                            ? 'bg-white/10 text-white'
-                                            : 'text-[#b5a89c] hover:bg-white/5 hover:text-white',
+                                            ? 'bg-surface-strong text-ink'
+                                            : 'text-ink-muted hover:bg-surface-strong hover:text-ink',
                                     )}
                                 >
                                     {item.title}
@@ -70,7 +64,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                 </aside>
 
                 <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+                    <section className="max-w-xl space-y-12 rounded-[1.5rem] border border-hairline bg-surface p-5 sm:p-6">
                         {children}
                     </section>
                 </div>

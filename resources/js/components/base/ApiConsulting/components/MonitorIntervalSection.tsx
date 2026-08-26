@@ -30,7 +30,7 @@ function MonitorIntervalSection({
     return (
         <motion.div
             className="content-box"
-            initial={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
         >

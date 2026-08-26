@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import { ApiAuthentication } from '@/components/base/ApiConsulting/components/ApiAuthentication';
 import { ApiUrlMonitor } from '@/components/base/ApiConsulting/components/ApiUrlMonitor';
 import { CustomHeadersSection } from '@/components/base/ApiConsulting/components/CustomHeadersSection';
@@ -7,10 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
     useClientApiProvider
-    
-    
+
+
 } from '@/hooks/use-client-api-provider';
-import type {ApiMonitorFormInitialValues, UseClientApiProviderOptions} from '@/hooks/use-client-api-provider';
+import type { ApiMonitorFormInitialValues, UseClientApiProviderOptions } from '@/hooks/use-client-api-provider';
 
 type ApiConsultingProps = {
     initialValues?: ApiMonitorFormInitialValues;
@@ -70,7 +71,12 @@ function ApiConsulting({
 
     return (
         <div className="col-span-full flex flex-col gap-8">
-            <div className="content-box">
+            <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="content-box"
+            >
                 <div className="mb-6">
                     <p className="text-xl font-medium">Identificação</p>
                     <p className="text-sm text-muted-foreground">
@@ -95,7 +101,7 @@ function ApiConsulting({
                     />
                     <InputError message={nameError ?? undefined} />
                 </div>
-            </div>
+            </motion.div>
 
             <ApiUrlMonitor
                 apiUrl={apiUrl}

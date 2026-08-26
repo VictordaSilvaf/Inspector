@@ -64,13 +64,13 @@ function StoryStat({
                               }
                     }
                 />
-                <div className="absolute inset-[3px] flex items-center justify-center rounded-full bg-[#0c0b0a] p-[3px]">
-                    <div className="flex size-full items-center justify-center rounded-full bg-[#161412] px-1 text-center text-[0.65rem] font-semibold leading-tight text-[#f5f0ea] sm:text-xs">
+                <div className="absolute inset-[3px] flex items-center justify-center rounded-full bg-canvas p-[3px]">
+                    <div className="flex size-full items-center justify-center rounded-full bg-elevated px-1 text-center text-[0.65rem] font-semibold leading-tight text-ink sm:text-xs">
                         {value}
                     </div>
                 </div>
             </div>
-            <span className="text-[0.7rem] text-[#b5a89c]">{label}</span>
+            <span className="text-[0.7rem] text-ink-muted">{label}</span>
         </div>
     );
 }
@@ -109,11 +109,11 @@ export default function Dashboard({ stats, monitors }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             >
-                <p className="mb-2 text-sm text-[#a89b90]">Painel</p>
-                <h1 className="mb-3 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold tracking-[-0.02em] text-balance text-white">
+                <p className="mb-2 text-sm text-ink-soft">Painel</p>
+                <h1 className="mb-3 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold tracking-[-0.02em] text-balance text-ink">
                     Olá, {firstName}
                 </h1>
-                <p className="mb-10 max-w-xl text-base leading-relaxed text-[#b5a89c]">
+                <p className="mb-10 max-w-xl text-base leading-relaxed text-ink-muted">
                     Acompanhe monitores, latência e falhas no mesmo ritmo visual
                     do Inspector — e entre direto no que precisa de atenção.
                 </p>
@@ -154,48 +154,48 @@ export default function Dashboard({ stats, monitors }: Props) {
             <div className="mb-8 flex flex-wrap gap-3">
                 <Link
                     href={apiInspectorCreate()}
-                    className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#0c0b0a] transition hover:bg-[#f3ebe3]"
+                    className="inline-flex items-center justify-center rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-canvas transition hover:opacity-90"
                 >
                     Novo monitor de API
                 </Link>
                 <Link
                     href={apiInspectorIndex()}
-                    className="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-[#f5f0ea] transition hover:border-white/40"
+                    className="inline-flex items-center justify-center rounded-full border border-hairline px-5 py-2.5 text-sm font-medium text-ink transition hover:border-ink/30"
                 >
                     Ver todos
                 </Link>
                 <Link
                     href={webhookInspectorIndex()}
-                    className="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-[#f5f0ea] transition hover:border-white/40"
+                    className="inline-flex items-center justify-center rounded-full border border-hairline px-5 py-2.5 text-sm font-medium text-ink transition hover:border-ink/30"
                 >
                     Webhooks
                 </Link>
             </div>
 
-            <section className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <section className="rounded-[1.5rem] border border-hairline bg-surface p-5 sm:p-6">
                 <div className="mb-5 flex items-end justify-between gap-3">
                     <div>
-                        <h2 className="text-lg font-semibold text-white">
+                        <h2 className="text-lg font-semibold text-ink">
                             Monitores recentes
                         </h2>
-                        <p className="text-sm text-[#a89b90]">
+                        <p className="text-sm text-ink-soft">
                             Últimos endpoints que você acompanha
                         </p>
                     </div>
                 </div>
 
                 {monitors.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-white/15 px-5 py-12 text-center">
-                        <p className="mb-2 text-base font-medium text-white">
+                    <div className="rounded-2xl border border-dashed border-hairline px-5 py-12 text-center">
+                        <p className="mb-2 text-base font-medium text-ink">
                             Nenhum monitor ainda
                         </p>
-                        <p className="mb-6 text-sm text-[#b5a89c]">
+                        <p className="mb-6 text-sm text-ink-muted">
                             Cadastre a primeira API e o Inspector começa a
                             checar status e latência.
                         </p>
                         <Link
                             href={apiInspectorCreate()}
-                            className="inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#0c0b0a]"
+                            className="inline-flex rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-canvas"
                         >
                             Criar primeiro monitor
                         </Link>
@@ -217,13 +217,13 @@ export default function Dashboard({ stats, monitors }: Props) {
                             >
                                 <Link
                                     href={apiInspectorShow(monitor.id)}
-                                    className="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.04] px-4 py-3 transition hover:bg-white/[0.07]"
+                                    className="flex items-center justify-between gap-3 rounded-2xl bg-surface px-4 py-3 transition hover:bg-surface-strong"
                                 >
                                     <div className="min-w-0">
-                                        <p className="truncate text-sm font-medium text-[#f3ebe3]">
+                                        <p className="truncate text-sm font-medium text-ink-warm">
                                             {monitor.name}
                                         </p>
-                                        <p className="truncate text-xs text-[#a89b90]">
+                                        <p className="truncate text-xs text-ink-soft">
                                             {monitor.httpMethod} ·{' '}
                                             {statusLabel(
                                                 monitor.lastStatus,
@@ -237,7 +237,7 @@ export default function Dashboard({ stats, monitors }: Props) {
                                     <p
                                         className={
                                             monitor.consecutiveFailures > 0
-                                                ? 'shrink-0 text-sm font-semibold text-[#ff8a4c]'
+                                                ? 'shrink-0 text-sm font-semibold text-brand-warm'
                                                 : 'shrink-0 text-sm font-semibold text-emerald-300'
                                         }
                                     >

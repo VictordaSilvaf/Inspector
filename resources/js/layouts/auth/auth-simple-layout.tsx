@@ -21,8 +21,8 @@ function StoryLogo() {
                         : { duration: 16, repeat: Infinity, ease: 'linear' }
                 }
             />
-            <div className="absolute inset-[3px] flex items-center justify-center rounded-full bg-[#0c0b0a]">
-                <div className="flex size-full items-center justify-center rounded-full bg-[#161412] text-sm font-semibold tracking-tight text-[#f5f0ea]">
+            <div className="absolute inset-[3px] flex items-center justify-center rounded-full bg-canvas">
+                <div className="flex size-full items-center justify-center rounded-full bg-elevated text-sm font-semibold tracking-tight text-ink">
                     In
                 </div>
             </div>
@@ -36,14 +36,11 @@ export default function AuthSimpleLayout({
     description,
 }: AuthLayoutProps) {
     return (
-        <div className="dark relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-[#0c0b0a] p-6 font-display text-[#f5f0ea] antialiased md:p-10">
+        <div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-canvas p-6 font-display text-ink antialiased md:p-10">
             <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0"
-                style={{
-                    background:
-                        'radial-gradient(ellipse 90% 70% at 50% -10%, rgba(221,42,123,0.28), transparent 55%), radial-gradient(ellipse 60% 50% at 100% 40%, rgba(245,133,41,0.18), transparent 50%), linear-gradient(180deg, #120f0d 0%, #0c0b0a 55%, #0c0b0a 100%)',
-                }}
+                style={{ background: 'var(--auth-glow)' }}
             />
 
             <div className="relative z-10 w-full max-w-sm">
@@ -54,25 +51,25 @@ export default function AuthSimpleLayout({
                             className="flex flex-col items-center gap-3 font-medium"
                         >
                             <StoryLogo />
-                            <span className="text-lg font-semibold tracking-tight text-white">
+                            <span className="text-lg font-semibold tracking-tight text-ink">
                                 Inspector
                             </span>
                             <span className="sr-only">{title}</span>
                         </Link>
 
                         <div className="space-y-2 text-center">
-                            <h1 className="text-xl font-semibold tracking-tight text-white">
+                            <h1 className="text-xl font-semibold tracking-tight text-ink">
                                 {title}
                             </h1>
                             {description ? (
-                                <p className="text-center text-sm leading-relaxed text-[#b5a89c]">
+                                <p className="text-center text-sm leading-relaxed text-ink-muted">
                                     {description}
                                 </p>
                             ) : null}
                         </div>
                     </div>
 
-                    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm [&_a]:text-[#f5f0ea] [&_button]:rounded-full [&_input]:rounded-xl [&_label]:text-[#f3ebe3]">
+                    <div className="rounded-[1.5rem] border border-hairline bg-surface p-6 shadow-[0_24px_80px_rgba(12,11,10,0.08)] backdrop-blur-sm dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)] [&_a]:text-ink [&_button]:rounded-full [&_input]:rounded-xl [&_label]:text-ink-warm">
                         {children}
                     </div>
                 </div>

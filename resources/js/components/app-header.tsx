@@ -2,6 +2,7 @@ import { Link, router } from '@inertiajs/react';
 import { index as apiInspectorIndex } from '@/routes/api-inspector';
 import { index as webhookInspectorIndex } from '@/routes/webhook-inspector';
 import { edit as editProfile } from '@/routes/profile';
+import AppearanceToggle from '@/components/appearance-toggle';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn } from '@/lib/utils';
@@ -13,32 +14,33 @@ type Props = {
 };
 
 const navLinkClass =
-    'rounded-full px-3 py-1.5 text-sm transition hover:bg-white/5 hover:text-white';
+    'rounded-full px-3 py-1.5 text-sm transition hover:bg-surface-strong hover:text-ink';
 
 export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
     return (
         <>
-            <header className="relative z-20 border-b border-white/5">
+            <header className="relative z-20 border-b border-hairline">
                 <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
                     <Link
                         href={dashboard()}
                         prefetch
-                        className="text-lg font-semibold tracking-tight text-white"
+                        className="text-lg font-semibold tracking-tight text-ink"
                     >
                         Inspector
                     </Link>
 
                     <nav className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
+                        <AppearanceToggle />
                         <Link
                             href={dashboard()}
                             prefetch
                             className={cn(
                                 navLinkClass,
                                 isCurrentOrParentUrl(dashboard())
-                                    ? 'bg-white/10 text-white'
-                                    : 'text-[#b5a89c]',
+                                    ? 'bg-surface-strong text-ink'
+                                    : 'text-ink-muted',
                             )}
                         >
                             Painel
@@ -49,8 +51,8 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
                             className={cn(
                                 navLinkClass,
                                 isCurrentOrParentUrl(apiInspectorIndex())
-                                    ? 'bg-white/10 text-white'
-                                    : 'text-[#b5a89c]',
+                                    ? 'bg-surface-strong text-ink'
+                                    : 'text-ink-muted',
                             )}
                         >
                             APIs
@@ -61,8 +63,8 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
                             className={cn(
                                 navLinkClass,
                                 isCurrentOrParentUrl(webhookInspectorIndex())
-                                    ? 'bg-white/10 text-white'
-                                    : 'text-[#b5a89c]',
+                                    ? 'bg-surface-strong text-ink'
+                                    : 'text-ink-muted',
                             )}
                         >
                             Webhooks
@@ -73,8 +75,8 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
                             className={cn(
                                 navLinkClass,
                                 isCurrentOrParentUrl('/settings')
-                                    ? 'bg-white/10 text-white'
-                                    : 'text-[#b5a89c]',
+                                    ? 'bg-surface-strong text-ink'
+                                    : 'text-ink-muted',
                             )}
                         >
                             Conta
@@ -82,7 +84,7 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
                         <button
                             type="button"
                             onClick={() => router.post(logout())}
-                            className={cn(navLinkClass, 'text-[#b5a89c]')}
+                            className={cn(navLinkClass, 'text-ink-muted')}
                         >
                             Sair
                         </button>
@@ -91,8 +93,8 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
             </header>
 
             {breadcrumbs.length > 1 ? (
-                <div className="relative z-20 border-b border-white/5">
-                    <div className="mx-auto flex h-11 w-full max-w-6xl items-center px-5 text-[#a89b90] sm:px-8 [&_a]:text-[#b5a89c] [&_a:hover]:text-white [&_span]:text-[#f5f0ea]">
+                <div className="relative z-20 border-b border-hairline">
+                    <div className="mx-auto flex h-11 w-full max-w-6xl items-center px-5 text-ink-soft sm:px-8 [&_a]:text-ink-muted [&_a:hover]:text-ink [&_span]:text-ink">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>

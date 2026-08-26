@@ -178,7 +178,7 @@ function CheckHistoryItem({
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+            className="rounded-2xl border border-hairline bg-surface p-4"
         >
             <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
@@ -301,7 +301,7 @@ export default function ApiInspectorShow({
                         <div className="flex flex-wrap gap-2">
                             <Button
                                 variant="ghost"
-                                className="w-fit px-0 text-[#b5a89c] hover:text-white"
+                                className="w-fit px-0 text-ink-muted hover:text-ink"
                                 onClick={() =>
                                     router.visit(apiInspectorIndex())
                                 }
@@ -311,7 +311,7 @@ export default function ApiInspectorShow({
                             </Button>
                             <Button
                                 variant="outline"
-                                className="w-fit rounded-full border-white/20 bg-transparent hover:bg-white/5"
+                                className="w-fit rounded-full border-hairline bg-transparent hover:bg-surface-strong"
                                 onClick={() =>
                                     router.visit(alertsIndex.url(monitor.id))
                                 }
@@ -326,10 +326,10 @@ export default function ApiInspectorShow({
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.35, ease: 'easeOut', delay: 0.05 }}
                         >
-                            <h1 className="pr-28 text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-white">
+                            <h1 className="pr-28 text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight text-ink">
                                 {monitor.name}
                             </h1>
-                            <p className="mt-1 text-[#b5a89c]">
+                            <p className="mt-1 text-ink-muted">
                                 {monitor.url}
                             </p>
                             <div className="mt-4 flex flex-wrap gap-2">
@@ -375,10 +375,10 @@ export default function ApiInspectorShow({
                         transition={{ delay: 0.12 }}
                     >
                         <div>
-                            <h2 className="text-xl font-semibold text-white">
+                            <h2 className="text-xl font-semibold text-ink">
                                 Editar configuração
                             </h2>
-                            <p className="text-sm text-[#b5a89c]">
+                            <p className="text-sm text-ink-muted">
                                 Atualize URL, intervalo, autenticação e
                                 headers.
                             </p>
@@ -399,10 +399,10 @@ export default function ApiInspectorShow({
                         viewport={{ once: true, amount: 0.1 }}
                     >
                         <div>
-                            <h2 className="text-xl font-semibold text-white">
+                            <h2 className="text-xl font-semibold text-ink">
                                 Histórico de verificações
                             </h2>
-                            <p className="text-sm text-[#b5a89c]">
+                            <p className="text-sm text-ink-muted">
                                 Logs das consultas feitas a esta API,
                                 atualizados em tempo real.
                             </p>
@@ -410,19 +410,19 @@ export default function ApiInspectorShow({
 
                         {showNewChecksBanner && (
                             <motion.div
-                                className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between"
+                                className="flex flex-col gap-3 rounded-2xl border border-hairline bg-surface p-4 sm:flex-row sm:items-center sm:justify-between"
                                 initial={{ opacity: 0, y: -8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <p className="text-sm text-[#f3ebe3]">
+                                <p className="text-sm text-ink-warm">
                                     Há novas verificações desde que você rolou
                                     o histórico.
                                 </p>
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="rounded-full border-white/20"
+                                    className="rounded-full border-hairline"
                                     onClick={loadLatestChecks}
                                 >
                                     Ver logs mais recentes
@@ -432,7 +432,7 @@ export default function ApiInspectorShow({
 
                         {checks.data.length === 0 ? (
                             <motion.div
-                                className="rounded-2xl border border-dashed border-white/15 p-8 text-center text-[#b5a89c]"
+                                className="rounded-2xl border border-dashed border-hairline p-8 text-center text-ink-muted"
                                 initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.12 }}
@@ -448,7 +448,7 @@ export default function ApiInspectorShow({
                                 next={({ loading, hasMore }) => {
                                     if (! hasMore) {
                                         return (
-                                            <p className="py-3 text-center text-sm text-[#a89b90]">
+                                            <p className="py-3 text-center text-sm text-ink-soft">
                                                 Fim do histórico · {checks.total}{' '}
                                                 registro(s)
                                             </p>
@@ -460,7 +460,7 @@ export default function ApiInspectorShow({
                                     }
 
                                     return (
-                                        <div className="flex items-center justify-center gap-2 py-4 text-sm text-[#a89b90]">
+                                        <div className="flex items-center justify-center gap-2 py-4 text-sm text-ink-soft">
                                             <Spinner className="size-4" />
                                             Carregando mais logs...
                                         </div>
