@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApiMonitor;
+use App\Services\DashboardChartData;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, DashboardChartData $chartData): Response
     {
         $user = $request->user();
 
@@ -42,6 +43,7 @@ class DashboardController extends Controller
                 'averageResponseTimeMs' => $avgMs,
                 'notificationChannels' => $channelsCount,
             ],
+            'charts' => $chartData->forUser($user),
             'monitors' => $monitors,
         ]);
     }

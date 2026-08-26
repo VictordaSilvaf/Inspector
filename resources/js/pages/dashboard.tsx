@@ -1,5 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import SeoHead from '@/components/seo-head';
+import { AvailabilityBarChart } from '@/components/dashboard/availability-bar-chart';
+import { ChartCard } from '@/components/dashboard/chart-card';
+import { LatencyAreaChart } from '@/components/dashboard/latency-area-chart';
+import { MonitorLatencyChart } from '@/components/dashboard/monitor-latency-chart';
+import { StatusDonutChart } from '@/components/dashboard/status-donut-chart';
 import { motion, useReducedMotion } from 'motion/react';
 import {
     create as apiInspectorCreate,
@@ -28,8 +33,34 @@ type DashboardStats = {
     notificationChannels: number;
 };
 
+type DashboardCharts = {
+    statusBreakdown: Array<{
+        status: string;
+        label: string;
+        count: number;
+    }>;
+    latencyTrend: Array<{
+        label: string;
+        averageMs: number | null;
+        checks: number;
+    }>;
+    availabilityTrend: Array<{
+        label: string;
+        success: number;
+        warning: number;
+        error: number;
+    }>;
+    monitorLatency: Array<{
+        id: number;
+        name: string;
+        averageMs: number;
+        status: string | null;
+    }>;
+};
+
 type Props = {
     stats: DashboardStats;
+    charts: DashboardCharts;
     monitors: DashboardMonitor[];
 };
 
@@ -96,7 +127,7 @@ function statusLabel(status: string | null, failures: number): string {
     return status;
 }
 
-export default function Dashboard({ stats, monitors }: Props) {
+export default function Dashboard({ stats, charts, monitors }: Props) {
     const { auth } = usePage().props;
     const reduceMotion = useReducedMotion();
     const firstName = auth.user?.name?.split(' ')[0] ?? 'olá';
@@ -173,6 +204,51 @@ export default function Dashboard({ stats, monitors }: Props) {
                 </Link>
             </div>
 
+            <div className="mb-8 grid gap-6 lg:grid-cols-2">
+                <ChartCard
+                    className="lg:col-span-2"
+                    title="Latência média"
+                    description="Últimas 24 horas — média por hora em todos os monitores"
+                    delay={0.05}
+                >
+                    <LatencyAreaChart data={charts.latencyTrend} delay={0.1} />
+                </ChartCard>
+
+                <ChartCard
+                    title="Status dos checks"
+                    description="Distribuição nas últimas 24 horas"
+                    delay={0.12}
+                >
+                    <StatusDonutChart
+                        data={charts.statusBreakdown}
+                        delay={0.18}
+                    />
+                </ChartCard>
+
+                <ChartCard
+                    title="Checks por hora"
+                    description="Volume empilhado por resultado"
+                    delay={0.16}
+                >
+                    <AvailabilityBarChart
+                        data={charts.availabilityTrend}
+                        delay={0.22}
+                    />
+                </ChartCard>
+
+                <ChartCard
+                    className="lg:col-span-2"
+                    title="Latência por monitor"
+                    description="Média das últimas 24 horas — clique para abrir detalhes"
+                    delay={0.2}
+                >
+                    <MonitorLatencyChart
+                        data={charts.monitorLatency}
+                        delay={0.26}
+                    />
+                </ChartCard>
+            </div>
+
             <section className="rounded-[1.5rem] border border-hairline bg-surface p-5 sm:p-6">
                 <div className="mb-5 flex items-end justify-between gap-3">
                     <div>
@@ -239,7 +315,7 @@ export default function Dashboard({ stats, monitors }: Props) {
                                         className={
                                             monitor.consecutiveFailures > 0
                                                 ? 'shrink-0 text-sm font-semibold text-brand-warm'
-                                                : 'shrink-0 text-sm font-semibold text-emerald-300'
+                                                : 'shrink-0 text-sm font-semibold text-emerald-400'
                                         }
                                     >
                                         {monitor.lastResponseTimeMs !== null
