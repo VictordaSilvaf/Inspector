@@ -149,10 +149,10 @@
 
 @layer utilities {
     .content-box {
-        @apply bg-muted rounded-lg p-4 shadow-md;
+        @apply rounded-3xl border border-white/10 bg-white/[0.03] p-5 shadow-none;
     }
 
     .card {
-        @apply bg-muted rounded-lg shadow-md relative p-4;
+        @apply relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-5 shadow-none;
     }
 }

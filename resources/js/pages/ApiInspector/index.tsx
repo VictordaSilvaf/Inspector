@@ -109,20 +109,20 @@ export default function ApiInspectorIndex({
     return (
         <>
             <Head title="Monitoradores de API" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="mb-6 mt-8 flex flex-row items-center justify-between">
-                    <div className="flex flex-col gap-2">
-                        <h1 className="mb-2 text-2xl font-bold">
+            <div className="flex flex-1 flex-col gap-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p className="mb-2 text-sm text-[#a89b90]">APIs</p>
+                        <h1 className="mb-2 text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-tight text-white">
                             Monitoradores de API
                         </h1>
-                        <p className="text-muted-foreground">
-                            Lista de todas as API's que você está monitorando.
+                        <p className="max-w-xl text-base leading-relaxed text-[#b5a89c]">
+                            Lista de todas as APIs que você está monitorando.
                             Status atualizado em tempo real.
                         </p>
                     </div>
                     <Button
-                        variant="outline"
-                        className="flex flex-row"
+                        className="rounded-full"
                         onClick={() => router.visit(create())}
                     >
                         <PlusIcon className="h-4 w-4" />
@@ -131,15 +131,18 @@ export default function ApiInspectorIndex({
                 </div>
 
                 {monitors.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-                        <p className="text-lg font-medium">
+                    <div className="rounded-[1.5rem] border border-dashed border-white/15 px-5 py-16 text-center">
+                        <p className="text-lg font-medium text-white">
                             Nenhuma API monitorada
                         </p>
-                        <p className="max-w-md text-muted-foreground">
-                            Adicione sua primeira API para começar a
-                            acompanhar disponibilidade e tempo de resposta.
+                        <p className="mx-auto mt-2 max-w-md text-[#b5a89c]">
+                            Adicione sua primeira API para começar a acompanhar
+                            disponibilidade e tempo de resposta.
                         </p>
-                        <Button onClick={() => router.visit(create())}>
+                        <Button
+                            className="mt-6 rounded-full"
+                            onClick={() => router.visit(create())}
+                        >
                             <PlusIcon className="h-4 w-4" />
                             Adicionar monitor
                         </Button>
@@ -155,45 +158,53 @@ export default function ApiInspectorIndex({
                             <motion.div
                                 key={monitor.id}
                                 variants={cardVariants}
-                                className="card relative overflow-hidden border-2 border-border"
+                                className="card relative overflow-hidden"
                             >
-                                <h2 className="text-xl font-medium">
+                                <h2 className="text-xl font-medium text-white">
                                     {monitor.name}
                                 </h2>
-                                <p className="mb-4 text-muted-foreground">
+                                <p className="mb-4 text-[#b5a89c]">
                                     {monitor.url}
                                 </p>
 
-                                <Separator />
+                                <Separator className="bg-white/10" />
 
-                                <p className="mt-4">Rota:</p>
-                                <p className="text-muted-foreground">
-                                    {monitor.url}
+                                <p className="mt-4 text-sm text-[#f3ebe3]">
+                                    Rota:
                                 </p>
+                                <p className="text-[#b5a89c]">{monitor.url}</p>
                                 <div className="mt-2 grid grid-cols-2 gap-2">
                                     <div className="flex flex-col">
-                                        <p>Método:</p>
-                                        <p className="text-muted-foreground">
+                                        <p className="text-sm text-[#f3ebe3]">
+                                            Método:
+                                        </p>
+                                        <p className="text-[#b5a89c]">
                                             {monitor.httpMethod}
                                         </p>
                                     </div>
                                     <div className="flex flex-col">
-                                        <p>Intervalo:</p>
-                                        <p className="text-muted-foreground">
+                                        <p className="text-sm text-[#f3ebe3]">
+                                            Intervalo:
+                                        </p>
+                                        <p className="text-[#b5a89c]">
                                             {formatIntervalLabel(
                                                 monitor.intervalSeconds,
                                             )}
                                         </p>
                                     </div>
                                     <div className="flex flex-col">
-                                        <p>Status esperado:</p>
-                                        <p className="text-muted-foreground">
+                                        <p className="text-sm text-[#f3ebe3]">
+                                            Status esperado:
+                                        </p>
+                                        <p className="text-[#b5a89c]">
                                             {monitor.expectedStatusCode}
                                         </p>
                                     </div>
                                     <div className="flex flex-col">
-                                        <p>Última verificação:</p>
-                                        <p className="text-muted-foreground">
+                                        <p className="text-sm text-[#f3ebe3]">
+                                            Última verificação:
+                                        </p>
+                                        <p className="text-[#b5a89c]">
                                             {formatLastCheckedAt(
                                                 monitor.lastCheckedAt,
                                             )}
@@ -201,8 +212,10 @@ export default function ApiInspectorIndex({
                                     </div>
                                 </div>
 
-                                <p className="mt-2">Autenticação:</p>
-                                <p className="text-muted-foreground">
+                                <p className="mt-2 text-sm text-[#f3ebe3]">
+                                    Autenticação:
+                                </p>
+                                <p className="text-[#b5a89c]">
                                     {monitor.hasAuthentication
                                         ? 'Configurada'
                                         : 'Não configurada'}
@@ -210,8 +223,10 @@ export default function ApiInspectorIndex({
 
                                 {monitor.customHeaders.length > 0 && (
                                     <>
-                                        <p className="mt-2">Headers:</p>
-                                        <p className="line-clamp-3 text-muted-foreground">
+                                        <p className="mt-2 text-sm text-[#f3ebe3]">
+                                            Headers:
+                                        </p>
+                                        <p className="line-clamp-3 text-[#b5a89c]">
                                             {JSON.stringify(
                                                 Object.fromEntries(
                                                     monitor.customHeaders.map(
@@ -229,7 +244,7 @@ export default function ApiInspectorIndex({
                                 <div className="mt-4 flex flex-col gap-2">
                                     <Button
                                         variant="default"
-                                        className="flex w-full cursor-pointer flex-row"
+                                        className="flex w-full cursor-pointer flex-row rounded-full"
                                         onClick={() =>
                                             router.visit(show(monitor.id))
                                         }
@@ -240,7 +255,7 @@ export default function ApiInspectorIndex({
 
                                     <Button
                                         variant="outline"
-                                        className="flex w-full cursor-pointer flex-row"
+                                        className="flex w-full cursor-pointer flex-row rounded-full border-white/20 bg-transparent hover:bg-white/5"
                                         onClick={() =>
                                             router.visit(
                                                 alertsIndex.url(monitor.id),

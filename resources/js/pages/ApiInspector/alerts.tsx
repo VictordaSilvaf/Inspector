@@ -47,11 +47,11 @@ export default function ApiInspectorAlerts({
     return (
         <>
             <Head title={`${monitor.name} · Alertas`} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
-                <div className="mt-4 flex flex-col gap-3">
+            <div className="flex flex-1 flex-col gap-8">
+                <div className="flex flex-col gap-3">
                     <Button
                         variant="ghost"
-                        className="w-fit px-0"
+                        className="w-fit px-0 text-[#b5a89c] hover:text-white"
                         onClick={() =>
                             router.visit(apiInspectorShow.url(monitor.id))
                         }
@@ -60,11 +60,14 @@ export default function ApiInspectorAlerts({
                         Voltar para detalhes
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold">Alertas</h1>
-                        <p className="mt-1 text-muted-foreground">
+                        <p className="mb-2 text-sm text-[#a89b90]">Alertas</p>
+                        <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-semibold tracking-tight text-white">
+                            Alertas
+                        </h1>
+                        <p className="mt-1 text-[#b5a89c]">
                             {monitor.name} · {monitor.url}
                         </p>
-                        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#a89b90]">
                             Configure quantas regras quiser para esta API. Cada
                             alerta tem sua própria condição, cooldown e
                             destinatários.
@@ -72,7 +75,7 @@ export default function ApiInspectorAlerts({
                     </div>
                 </div>
 
-                <div className="max-w-3xl">
+                <div className="max-w-3xl rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 sm:p-6">
                     <MonitorAlertsPanel
                         monitorId={monitor.id}
                         alerts={alerts}
