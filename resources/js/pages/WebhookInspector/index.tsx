@@ -23,7 +23,7 @@ export default function WebhookInspectorIndex() {
 WebhookInspectorIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Webhook Inspector',
+            title: 'Monitor de Webhooks',
             href: webhookInspectorIndex(),
         },
     ],

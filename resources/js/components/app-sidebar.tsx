@@ -1,9 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Code, FolderGit2, LayoutGrid, MessageCircle } from 'lucide-react';
+import { Code, LayoutGrid, MessageCircle } from 'lucide-react';
 import { index as apiInspectorIndex } from '@/routes/api-inspector';
 import { index as webhookInspectorIndex } from '@/routes/webhook-inspector';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -20,32 +19,19 @@ import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Painel',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'API inspector',
+        title: 'Monitor de APIs',
         href: apiInspectorIndex(),
         icon: Code,
     },
     {
-        title: 'Webhook inspector',
+        title: 'Monitor de Webhooks',
         href: webhookInspectorIndex(),
         icon: MessageCircle,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
     },
 ];
 
@@ -69,7 +55,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

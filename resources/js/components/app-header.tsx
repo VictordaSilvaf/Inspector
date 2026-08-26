@@ -43,17 +43,17 @@ type Props = {
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Painel',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'API inspector',
+        title: 'Monitor de APIs',
         href: apiInspectorIndex(),
         icon: Code,
     },
     {
-        title: 'Webhook inspector',
+        title: 'Monitor de Webhooks',
         href: webhookInspectorIndex(),
         icon: MessageCircle,
     },
@@ -92,7 +92,7 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<Props>) {
                                 className="flex h-full w-64 flex-col items-stretch justify-between bg-sidebar"
                             >
                                 <SheetTitle className="sr-only">
-                                    Navigation menu
+                                    Menu de navegação
                                 </SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
                                     <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
