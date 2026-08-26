@@ -141,3 +141,13 @@
         @apply bg-background text-foreground;
     }
 }
+
+@layer utilities {
+    .content-box {
+        @apply bg-muted rounded-lg p-4 shadow-md;
+    }
+
+    .card {
+        @apply bg-muted rounded-lg shadow-md relative p-4;
+    }
+}

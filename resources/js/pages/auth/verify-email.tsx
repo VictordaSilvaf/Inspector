@@ -1,10 +1,10 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
+import { send } from '@/routes/verification';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { logout } from '@/routes';
-import { send } from '@/routes/verification';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     return (

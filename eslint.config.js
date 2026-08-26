@@ -81,6 +81,14 @@ export default [
                         'sibling',
                         'index',
                     ],
+                    pathGroups: [
+                        {
+                            pattern: '@/routes/**',
+                            group: 'internal',
+                            position: 'before',
+                        },
+                    ],
+                    pathGroupsExcludedImportTypes: [],
                     alphabetize: { order: 'asc', caseInsensitive: true },
                 },
             ],
