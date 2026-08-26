@@ -1,4 +1,5 @@
-import { Head, InfiniteScroll, router, usePoll } from '@inertiajs/react';
+import { InfiniteScroll, router, usePoll } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { ArrowLeftIcon, BellIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Variants } from 'motion/react';
@@ -289,7 +290,7 @@ export default function ApiInspectorShow({
 
     return (
         <>
-            <Head title={`${monitor.name} · Detalhes`} />
+            <SeoHead title={`${monitor.name} · Detalhes`} />
             <div className="flex flex-1 flex-col gap-8">
                 <motion.div
                     className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"

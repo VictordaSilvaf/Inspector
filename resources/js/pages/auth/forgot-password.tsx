@@ -1,5 +1,6 @@
 // Components
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { LoaderCircle } from 'lucide-react';
 import { email } from '@/routes/password';
 import InputError from '@/components/input-error';
@@ -12,7 +13,7 @@ import { login } from '@/routes';
 export default function ForgotPassword({ status }: { status?: string }) {
     return (
         <>
-            <Head title="Esqueci a senha" />
+            <SeoHead title="Esqueci a senha" />
 
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">

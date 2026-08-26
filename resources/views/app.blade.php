@@ -3,6 +3,10 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="{{ config('seo.default_description') }}">
+        <meta name="keywords" content="{{ config('seo.keywords') }}">
+        <meta name="theme-color" content="#0c0b0a">
+        <meta name="application-name" content="{{ config('seo.site_name') }}">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
@@ -36,7 +40,7 @@
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            <title>{{ config('seo.default_title') }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">

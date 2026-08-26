@@ -1,4 +1,5 @@
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { ArrowLeftIcon } from 'lucide-react';
 import { index as apiInspectorIndex, show as apiInspectorShow } from '@/routes/api-inspector';
 import { MonitorAlertsPanel } from '@/components/base/MonitorAlertsPanel';
@@ -46,7 +47,7 @@ export default function ApiInspectorAlerts({
 }: Readonly<ApiInspectorAlertsProps>) {
     return (
         <>
-            <Head title={`${monitor.name} · Alertas`} />
+            <SeoHead title={`${monitor.name} · Alertas`} />
             <div className="flex flex-1 flex-col gap-8">
                 <div className="flex flex-col gap-3">
                     <Button

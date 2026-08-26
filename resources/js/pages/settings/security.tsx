@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { useRef } from 'react';
 import { edit } from '@/routes/security';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
@@ -20,7 +21,7 @@ export default function Security(props: Props) {
 
     return (
         <>
-            <Head title="Configurações de segurança" />
+            <SeoHead title="Configurações de segurança" />
 
             <h1 className="sr-only">Configurações de segurança</h1>
 

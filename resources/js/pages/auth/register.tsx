@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { store } from '@/routes/register';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
@@ -16,7 +17,7 @@ type Props = {
 export default function Register({ passwordRules }: Props) {
     return (
         <>
-            <Head title="Criar conta" />
+            <SeoHead title="Criar conta" description="Crie sua conta no Inspector e comece a monitorar APIs com alertas por e-mail." robots="index, follow" />
             <Form
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}

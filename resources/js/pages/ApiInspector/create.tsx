@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import {
     create as apiInspectorCreate,
     index as apiInspectorIndex,
@@ -8,7 +8,7 @@ import { ApiConsulting } from '@/components/base/ApiConsulting';
 export default function ApiInspectorCreate() {
     return (
         <>
-            <Head title="Criar monitor de API" />
+            <SeoHead title="Criar monitor de API" />
             <div className="flex flex-1 flex-col gap-8">
                 <div>
                     <p className="mb-2 text-sm text-ink-soft">APIs</p>

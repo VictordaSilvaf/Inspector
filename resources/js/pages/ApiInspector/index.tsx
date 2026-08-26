@@ -1,4 +1,5 @@
-import { Head, router, usePoll } from '@inertiajs/react';
+import { router, usePoll } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { EyeIcon, PlusIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Variants } from 'motion/react';
@@ -108,7 +109,7 @@ export default function ApiInspectorIndex({
 
     return (
         <>
-            <Head title="Monitoradores de API" />
+            <SeoHead title="Monitoradores de API" />
             <div className="flex flex-1 flex-col gap-8">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>

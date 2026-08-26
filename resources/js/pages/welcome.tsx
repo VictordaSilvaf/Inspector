@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     animate,
     motion,
@@ -11,7 +11,9 @@ import {
 import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import AppearanceToggle from '@/components/appearance-toggle';
+import SeoHead from '@/components/seo-head';
 import { dashboard, login, register } from '@/routes';
+import type { SharedSeo } from '@/types/seo';
 
 const storyItems = [
     { label: 'APIs', value: 'várias' },
@@ -259,7 +261,7 @@ function SectionNav() {
 }
 
 export default function Welcome() {
-    const { auth } = usePage().props;
+    const { auth, seo } = usePage<{ auth: { user: unknown }; seo: SharedSeo }>().props;
     const reduceMotion = useReducedMotion();
     const heroRef = useRef<HTMLElement>(null);
     const { scrollYProgress } = useScroll({
@@ -282,7 +284,35 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="Monitore APIs, webhooks e alertas" />
+            <SeoHead
+                title="Monitore APIs, webhooks e alertas"
+                description="Monitore a saúde das suas APIs HTTP, acompanhe latência em tempo real e receba alertas por e-mail quando algo sair do esperado."
+                robots="index, follow"
+                jsonLd={[
+                    {
+                        '@context': 'https://schema.org',
+                        '@type': 'WebSite',
+                        name: seo.siteName,
+                        url: seo.url,
+                        description: seo.defaultDescription,
+                        inLanguage: seo.locale,
+                    },
+                    {
+                        '@context': 'https://schema.org',
+                        '@type': 'SoftwareApplication',
+                        name: seo.siteName,
+                        applicationCategory: 'DeveloperApplication',
+                        operatingSystem: 'Web',
+                        url: seo.url,
+                        description: seo.defaultDescription,
+                        offers: {
+                            '@type': 'Offer',
+                            price: '0',
+                            priceCurrency: 'BRL',
+                        },
+                    },
+                ]}
+            />
 
             <div className="min-h-screen bg-canvas font-display text-ink antialiased selection:bg-brand/35 selection:text-white">
                 <a

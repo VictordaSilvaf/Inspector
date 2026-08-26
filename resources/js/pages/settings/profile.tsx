@@ -1,4 +1,5 @@
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { Link } from '@inertiajs/react';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
@@ -26,7 +27,7 @@ export default function Profile({
 
     return (
         <>
-            <Head title="Configurações do perfil" />
+            <SeoHead title="Configurações do perfil" />
 
             <h1 className="sr-only">Configurações do perfil</h1>
 

@@ -1,5 +1,6 @@
 // Components
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { send } from '@/routes/verification';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { logout } from '@/routes';
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
         <>
-            <Head title="Verificação de email" />
+            <SeoHead title="Verificação de email" />
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">

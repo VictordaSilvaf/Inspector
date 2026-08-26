@@ -1,4 +1,5 @@
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { Button } from '@/components/ui/button';
 
 type UnsubscribeProps = {
@@ -18,7 +19,7 @@ export default function Unsubscribe({
 }: Readonly<UnsubscribeProps>) {
     return (
         <>
-            <Head title="Cancelar inscrição" />
+            <SeoHead title="Cancelar inscrição" />
             <div className="flex min-h-screen items-center justify-center p-6">
                 <div className="w-full max-w-md space-y-4 rounded-xl border border-border p-6 text-center">
                     <h1 className="text-xl font-semibold">

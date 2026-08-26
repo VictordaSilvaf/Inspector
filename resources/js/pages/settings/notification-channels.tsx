@@ -1,4 +1,5 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
@@ -46,7 +47,7 @@ export default function NotificationChannels({ channels }: Readonly<Props>) {
 
     return (
         <>
-            <Head title="Canais de notificação" />
+            <SeoHead title="Canais de notificação" />
 
             <h1 className="sr-only">Canais de notificação</h1>
 

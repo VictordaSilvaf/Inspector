@@ -1,4 +1,5 @@
-import { Form, Head, setLayoutProps } from '@inertiajs/react';
+import { Form, setLayoutProps } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
 import { store } from '@/routes/two-factor/login';
@@ -51,7 +52,7 @@ export default function TwoFactorChallenge() {
 
     return (
         <>
-            <Head title="Autenticação em dois fatores" />
+            <SeoHead title="Autenticação em dois fatores" />
 
             <div className="space-y-6">
                 <Form

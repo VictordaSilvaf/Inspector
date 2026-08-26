@@ -1,4 +1,5 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { motion, useReducedMotion } from 'motion/react';
 import {
     create as apiInspectorCreate,
@@ -102,7 +103,7 @@ export default function Dashboard({ stats, monitors }: Props) {
 
     return (
         <>
-            <Head title="Painel" />
+            <SeoHead title="Painel" />
 
             <motion.div
                 initial={reduceMotion ? false : { opacity: 0, y: 16 }}

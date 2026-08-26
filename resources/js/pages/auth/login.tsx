@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import InputError from '@/components/input-error';
@@ -19,7 +20,7 @@ type Props = {
 export default function Login({ status, canResetPassword }: Props) {
     return (
         <>
-            <Head title="Entrar" />
+            <SeoHead title="Entrar" description="Acesse sua conta Inspector para gerenciar monitores de API, alertas e notificações." robots="index, follow" />
 
             <Form
                 {...store.form()}

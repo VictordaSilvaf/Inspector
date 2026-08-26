@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { store } from '@/routes/password/confirm';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
@@ -9,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 export default function ConfirmPassword() {
     return (
         <>
-            <Head title="Confirmar senha" />
+            <SeoHead title="Confirmar senha" />
 
             <Form {...store.form()} resetOnSuccess={['password']}>
                 {({ processing, errors }) => (

@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import { update } from '@/routes/password';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
@@ -16,7 +17,7 @@ type Props = {
 export default function ResetPassword({ token, email, passwordRules }: Props) {
     return (
         <>
-            <Head title="Redefinir senha" />
+            <SeoHead title="Redefinir senha" />
 
             <Form
                 {...update.form()}

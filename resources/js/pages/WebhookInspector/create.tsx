@@ -1,4 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import SeoHead from '@/components/seo-head';
 import {
     create as webhookInspectorCreate,
     index as webhookInspectorIndex,
@@ -7,7 +8,7 @@ import {
 export default function WebhookInspectorCreate() {
     return (
         <>
-            <Head title="Criar monitor de Webhook" />
+            <SeoHead title="Criar monitor de Webhook" />
             <div className="flex flex-1 flex-col gap-8">
                 <div>
                     <p className="mb-2 text-sm text-ink-soft">Webhooks</p>
