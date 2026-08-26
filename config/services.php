@@ -40,8 +40,8 @@ return [
     ],
 
     'monitor_urls' => [
-        'require_https' => env('MONITOR_URL_REQUIRE_HTTPS', false),
-        'require_dns' => env('MONITOR_URL_REQUIRE_DNS', true),
+        'require_https' => env('MONITOR_URL_REQUIRE_HTTPS', env('APP_ENV') === 'production'),
+        'require_dns' => env('MONITOR_URL_REQUIRE_DNS', env('APP_ENV') === 'production'),
     ],
 
 ];

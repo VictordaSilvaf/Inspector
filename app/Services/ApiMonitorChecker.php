@@ -8,6 +8,7 @@ use App\Models\ApiMonitorCheck;
 use App\Services\Alerts\MonitorAlertEvaluator;
 use App\Services\Security\MonitorSecretAuditService;
 use App\Services\Security\MonitorUrlGuard;
+use App\Services\Security\ResponseBodyRedactor;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
@@ -27,6 +28,7 @@ class ApiMonitorChecker
         private readonly ApiMonitorHeaderService $headerService,
         private readonly MonitorUrlGuard $urlGuard,
         private readonly MonitorSecretAuditService $auditService,
+        private readonly ResponseBodyRedactor $responseBodyRedactor,
     ) {}
 
     public function check(ApiMonitor $monitor, string $triggeredBy = 'manual'): ApiMonitorCheck
@@ -189,7 +191,9 @@ class ApiMonitorChecker
             return null;
         }
 
-        return mb_substr($body, 0, self::BodyPreviewLimit);
+        $preview = mb_substr($body, 0, self::BodyPreviewLimit);
+
+        return $this->responseBodyRedactor->redact($preview);
     }
 
     /**

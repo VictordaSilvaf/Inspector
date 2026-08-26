@@ -72,6 +72,7 @@ RUN apt-get update \
         nginx \
         supervisor \
         curl \
+        iptables \
         libpq-dev \
         libzip-dev \
         libpng-dev \
@@ -99,10 +100,12 @@ COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/10-opcache.ini
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/queue-entrypoint.sh /docker/queue-entrypoint.sh
+COPY docker/scripts/setup-queue-egress.sh /docker/scripts/setup-queue-egress.sh
 
 RUN sed -i 's|^listen = .*|listen = 127.0.0.1:9000|' /usr/local/etc/php-fpm.d/www.conf \
     && sed -i 's|^;clear_env = no|clear_env = no|' /usr/local/etc/php-fpm.d/www.conf \
-    && chmod +x /usr/local/bin/entrypoint.sh
+    && chmod +x /usr/local/bin/entrypoint.sh /docker/queue-entrypoint.sh /docker/scripts/setup-queue-egress.sh
 
 WORKDIR /var/www/html
 

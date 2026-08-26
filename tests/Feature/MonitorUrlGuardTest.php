@@ -56,3 +56,20 @@ test('monitor url guard can require https when configured', function () {
     expect(fn () => $guard->assertSafe('http://api.example.com/health'))
         ->toThrow(InvalidMonitorUrlException::class);
 });
+
+test('monitor url guard can require dns when configured', function () {
+    config(['services.monitor_urls.require_dns' => true]);
+
+    $guard = app(MonitorUrlGuard::class);
+
+    expect(fn () => $guard->assertSafe('https://this-domain-should-not-exist-12345.invalid/health'))
+        ->toThrow(InvalidMonitorUrlException::class);
+});
+
+test('monitor url config defaults to strict policy in production environment', function () {
+    $servicesConfig = file_get_contents(config_path('services.php'));
+
+    expect($servicesConfig)
+        ->toContain("env('MONITOR_URL_REQUIRE_HTTPS', env('APP_ENV') === 'production')")
+        ->toContain("env('MONITOR_URL_REQUIRE_DNS', env('APP_ENV') === 'production')");
+});

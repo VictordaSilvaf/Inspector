@@ -1,7 +1,7 @@
 name: inspector-prod
 
-# Egress filtering for RFC1918 outbound HTTP must be enforced at the cloud
-# firewall/security-group level. Docker bridge networks alone do not block SSRF.
+# Queue workers apply iptables egress rules (see docker/scripts/setup-queue-egress.sh).
+# Cloud firewall/security-group rules remain recommended as an additional layer.
 
 x-app-common: &app-common
     build:
@@ -61,6 +61,10 @@ services:
 
     queue:
         <<: *app-common
+        cap_add:
+            - NET_ADMIN
+        entrypoint:
+            - /docker/queue-entrypoint.sh
         command:
             - php
             - artisan
@@ -71,6 +75,7 @@ services:
         environment:
             RUN_MIGRATIONS: 'false'
             CACHE_CONFIG: 'true'
+            EGRESS_FILTER_ENABLED: 'true'
         depends_on:
             app:
                 condition: service_healthy
