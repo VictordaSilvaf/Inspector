@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+ENV_FILE="${ENV_FILE:-.env.production}"
+COMPOSE_FILE="${COMPOSE_FILE:-compose.prod.yaml}"
+
+if [[ ! -f "$ENV_FILE" ]]; then
+    echo "Missing ${ENV_FILE}. Copy from .env.production.example and fill secrets." >&2
+    exit 1
+fi
+
+if [[ ! -f "$COMPOSE_FILE" ]]; then
+    echo "Missing ${COMPOSE_FILE}." >&2
+    exit 1
+fi
+
+exec docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" "$@"
