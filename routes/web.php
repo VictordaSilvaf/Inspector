@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiInspector\ApiMonitorController;
 use App\Http\Controllers\ApiInspector\MonitorAlertController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UnsubscribeController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +16,7 @@ Route::post('unsubscribe/{token}', [UnsubscribeController::class, 'store'])
     ->name('unsubscribe.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::prefix('api-inspector')->name('api-inspector.')->group(function () {
         Route::get('/', [ApiMonitorController::class, 'index'])->name('index');
