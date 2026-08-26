@@ -1,5 +1,6 @@
-import { motion } from 'motion/react';
+import { animate, motion, useMotionValue, useTransform } from 'motion/react';
 import type { Variants } from 'motion/react';
+import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const API_STATUS_INDICATOR_STATUSES = [
@@ -58,6 +59,29 @@ function StatusDot({ className }: Readonly<{ className: string }>) {
     );
 }
 
+function AnimatedResponseTime({
+    time,
+    className,
+}: Readonly<{ time: number; className?: string }>) {
+    const count = useMotionValue(0);
+    const rounded = useTransform(() => Math.round(count.get()));
+
+    useEffect(() => {
+        const controls = animate(count, time, {
+            duration: 0.6,
+            ease: 'easeOut',
+        });
+
+        return () => controls.stop();
+    }, [count, time]);
+
+    return (
+        <p className={className}>
+            <motion.span>{rounded}</motion.span>ms
+        </p>
+    );
+}
+
 function ApiStatusIndicator({
     time,
     status = 'success',
@@ -84,15 +108,10 @@ function ApiStatusIndicator({
             )}
         >
             {showTime && (
-                <motion.p
-                    key={`${status}-${time}`}
-                    initial={{ opacity: 0.6, y: -2 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                <AnimatedResponseTime
+                    time={time}
                     className={cn('text-sm font-bold pb-1', labelClassName)}
-                >
-                    {time}ms
-                </motion.p>
+                />
             )}
             <motion.div
                 key={status}
