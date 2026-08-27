@@ -21,3 +21,13 @@ test('appearance cookie is shared with the view', function () {
     $response->assertOk();
     $response->assertViewHas('appearance', 'light');
 });
+
+test('appearance cookie is shared with inertia props', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->withUnencryptedCookie('appearance', 'dark')
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->where('appearance', 'dark'));
+});

@@ -7,6 +7,7 @@
         <meta name="keywords" content="{{ config('seo.keywords') }}">
         <meta name="theme-color" content="#0c0b0a">
         <meta name="application-name" content="{{ config('seo.site_name') }}">
+        <meta name="appearance" content="{{ $appearance ?? 'system' }}">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>

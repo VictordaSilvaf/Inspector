@@ -1,5 +1,5 @@
 import { Moon, Sun } from 'lucide-react';
-import type { HTMLAttributes } from 'react';
+import { useEffect, useState, type HTMLAttributes } from 'react';
 import { useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
 
@@ -7,7 +7,13 @@ type Props = HTMLAttributes<HTMLButtonElement>;
 
 export default function AppearanceToggle({ className, ...props }: Props) {
     const { resolvedAppearance, updateAppearance } = useAppearance();
-    const isDark = resolvedAppearance === 'dark';
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedAppearance === 'dark';
 
     return (
         <button
@@ -19,6 +25,7 @@ export default function AppearanceToggle({ className, ...props }: Props) {
             )}
             aria-label={isDark ? 'Ativar tema claro' : 'Ativar tema escuro'}
             title={isDark ? 'Tema claro' : 'Tema escuro'}
+            suppressHydrationWarning
             {...props}
         >
             {isDark ? (

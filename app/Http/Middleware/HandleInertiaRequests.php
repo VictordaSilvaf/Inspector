@@ -48,6 +48,7 @@ class HandleInertiaRequests extends Middleware
                     : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'appearance' => $request->cookie('appearance') ?? 'system',
         ];
     }
 }

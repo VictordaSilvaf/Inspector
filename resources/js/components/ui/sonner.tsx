@@ -1,15 +1,21 @@
+import { useEffect, useState } from 'react';
 import { useFlashToast } from '@/hooks/use-flash-toast';
 import { useAppearance } from '@/hooks/use-appearance';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
 function Toaster({ ...props }: ToasterProps) {
     const { resolvedAppearance } = useAppearance();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useFlashToast();
 
     return (
         <Sonner
-            theme={resolvedAppearance}
+            theme={mounted ? resolvedAppearance : 'light'}
             className="toaster group"
             position="bottom-right"
             style={

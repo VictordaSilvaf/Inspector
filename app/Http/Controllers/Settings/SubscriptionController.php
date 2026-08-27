@@ -14,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Cashier\Checkout;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class SubscriptionController extends Controller
 {
@@ -41,7 +42,7 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    public function update(SubscribePlanRequest $request): RedirectResponse|Checkout
+    public function update(SubscribePlanRequest $request): RedirectResponse|SymfonyResponse
     {
         $user = $request->user();
         $targetPlan = $request->targetPlan();
@@ -56,12 +57,14 @@ class SubscriptionController extends Controller
 
         $response = $this->stripeBilling->changePlan($user, $targetPlan);
 
-        if ($response instanceof RedirectResponse) {
-            Inertia::flash('toast', [
-                'type' => 'success',
-                'message' => __('Plano alterado para :plan.', ['plan' => $targetPlan->label()]),
-            ]);
+        if ($response instanceof Checkout) {
+            return Inertia::location($response->url);
         }
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Plano alterado para :plan.', ['plan' => $targetPlan->label()]),
+        ]);
 
         return $response;
     }
@@ -79,8 +82,14 @@ class SubscriptionController extends Controller
         return to_route('subscription.edit');
     }
 
-    public function billingPortal(Request $request): RedirectResponse
+    public function billingPortal(Request $request): RedirectResponse|SymfonyResponse
     {
-        return $this->stripeBilling->redirectToBillingPortal($request->user());
+        $response = $this->stripeBilling->redirectToBillingPortal($request->user());
+
+        if ($request->header('X-Inertia')) {
+            return Inertia::location($response->getTargetUrl());
+        }
+
+        return $response;
     }
 }

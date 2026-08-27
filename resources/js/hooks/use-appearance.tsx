@@ -11,6 +11,11 @@ export type UseAppearanceReturn = {
 
 const listeners = new Set<() => void>();
 let currentAppearance: Appearance = 'system';
+let serverAppearance: Appearance = 'system';
+
+export function setServerAppearance(appearance: Appearance): void {
+    serverAppearance = appearance;
+}
 
 const prefersDark = (): boolean => {
     if (typeof window === 'undefined') {
@@ -29,12 +34,14 @@ const setCookie = (name: string, value: string, days = 365): void => {
     document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
-const getStoredAppearance = (): Appearance => {
-    if (typeof window === 'undefined') {
+const readCookieAppearance = (): Appearance => {
+    if (typeof document === 'undefined') {
         return 'system';
     }
 
-    return (localStorage.getItem('appearance') as Appearance) || 'system';
+    const meta = document.querySelector('meta[name="appearance"]');
+
+    return (meta?.getAttribute('content') as Appearance) || 'system';
 };
 
 const isDarkMode = (appearance: Appearance): boolean => {
@@ -75,15 +82,10 @@ export function initializeTheme(): void {
         return;
     }
 
-    if (!localStorage.getItem('appearance')) {
-        localStorage.setItem('appearance', 'system');
-        setCookie('appearance', 'system');
-    }
-
-    currentAppearance = getStoredAppearance();
+    currentAppearance = readCookieAppearance();
+    localStorage.setItem('appearance', currentAppearance);
     applyTheme(currentAppearance);
 
-    // Set up system theme change listener
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
@@ -91,7 +93,7 @@ export function useAppearance(): UseAppearanceReturn {
     const appearance: Appearance = useSyncExternalStore(
         subscribe,
         () => currentAppearance,
-        () => 'system',
+        () => serverAppearance,
     );
 
     const resolvedAppearance: ResolvedAppearance = isDarkMode(appearance)
@@ -101,11 +103,11 @@ export function useAppearance(): UseAppearanceReturn {
     const updateAppearance = (mode: Appearance): void => {
         currentAppearance = mode;
 
-        // Store in localStorage for client-side persistence...
         localStorage.setItem('appearance', mode);
-
-        // Store in cookie for SSR...
         setCookie('appearance', mode);
+
+        const meta = document.querySelector('meta[name="appearance"]');
+        meta?.setAttribute('content', mode);
 
         applyTheme(mode);
         notify();
