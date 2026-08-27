@@ -7,12 +7,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\UnsubscribeController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('robots.txt', RobotsController::class)->name('robots');
 Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
 
-Route::inertia('/', 'welcome')->name('home');
+Route::get('/', WelcomeController::class)->name('home');
 
 Route::get('unsubscribe/{token}', [UnsubscribeController::class, 'show'])
     ->middleware('throttle:30,1')

@@ -6,6 +6,8 @@ return [
 
     'intervals' => [5, 10, 15, 30, 60],
 
+    'default_highlighted' => SubscriptionPlan::Pro->value,
+
     'tiers' => [
         SubscriptionPlan::Free->value => [
             'max_monitors' => 3,
@@ -16,6 +18,8 @@ return [
             'credential_audit' => false,
             'credential_audit_export' => false,
             'requires_two_factor' => false,
+            'monthly_price_cents' => 0,
+            'description' => 'Para experimentar e monitorar poucos endpoints.',
         ],
         SubscriptionPlan::Pro->value => [
             'max_monitors' => 10,
@@ -26,6 +30,8 @@ return [
             'credential_audit' => true,
             'credential_audit_export' => false,
             'requires_two_factor' => false,
+            'monthly_price_cents' => 4900,
+            'description' => 'Para times que precisam de mais monitores e alertas.',
         ],
         SubscriptionPlan::Business->value => [
             'max_monitors' => 100,
@@ -36,6 +42,8 @@ return [
             'credential_audit' => true,
             'credential_audit_export' => true,
             'requires_two_factor' => true,
+            'monthly_price_cents' => 14900,
+            'description' => 'Para produção crítica com auditoria e compliance.',
         ],
     ],
 

@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { index as notificationChannelsIndex } from '@/routes/notification-channels';
 import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
+import { edit as subscriptionEdit } from '@/routes/subscription';
 import Heading from '@/components/heading';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
@@ -22,6 +23,11 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Notificações',
         href: notificationChannelsIndex(),
+        icon: null,
+    },
+    {
+        title: 'Assinatura',
+        href: subscriptionEdit(),
         icon: null,
     },
 ];
@@ -63,8 +69,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     </nav>
                 </aside>
 
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12 rounded-[1.5rem] border border-hairline bg-surface p-5 sm:p-6">
+                <div className="flex-1 md:max-w-6xl">
+                    <section className="max-w-full space-y-12 rounded-[1.5rem] border border-hairline bg-surface p-5 sm:p-6">
                         {children}
                     </section>
                 </div>

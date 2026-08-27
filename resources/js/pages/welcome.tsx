@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import PlanPricingGrid from '@/components/plans/plan-pricing-grid';
 import {
     animate,
     motion,
@@ -14,6 +15,7 @@ import AppearanceToggle from '@/components/appearance-toggle';
 import SeoHead from '@/components/seo-head';
 import { dashboard, login, register } from '@/routes';
 import type { SharedSeo } from '@/types/seo';
+import type { PlanCatalogItem } from '@/types/plan';
 
 const storyItems = [
     { label: 'APIs', value: 'várias' },
@@ -236,6 +238,7 @@ function SectionNav() {
         { href: '#apis', label: 'APIs' },
         { href: '#webhooks', label: 'Webhooks' },
         { href: '#alertas', label: 'Alertas' },
+        { href: '#planos', label: 'Planos' },
         { href: '#conexao', label: 'Conexão' },
         { href: '#seguranca', label: 'Segurança' },
     ];
@@ -261,7 +264,11 @@ function SectionNav() {
 }
 
 export default function Welcome() {
-    const { auth, seo } = usePage<{ auth: { user: unknown }; seo: SharedSeo }>().props;
+    const { auth, seo, plans } = usePage<{
+        auth: { user: unknown };
+        seo: SharedSeo;
+        plans: PlanCatalogItem[];
+    }>().props;
     const reduceMotion = useReducedMotion();
     const heroRef = useRef<HTMLElement>(null);
     const { scrollYProgress } = useScroll({
@@ -646,6 +653,32 @@ export default function Welcome() {
                                     </FadeIn>
                                 ))}
                             </div>
+                        </div>
+                    </section>
+
+                    <section
+                        id="planos"
+                        className="border-t border-hairline px-5 py-20 sm:px-8 sm:py-28"
+                    >
+                        <div className="mx-auto max-w-6xl">
+                            <FadeIn className="mb-12 max-w-2xl">
+                                <h2 className="mb-4 text-[clamp(1.75rem,4vw,2.75rem)] leading-tight font-semibold tracking-[-0.02em] text-balance text-ink">
+                                    Planos para cada fase do produto
+                                </h2>
+                                <p className="text-base leading-relaxed text-ink-muted">
+                                    Comece no Free, escale para Pro quando
+                                    precisar de mais monitores e alertas, ou vá
+                                    de Business para auditoria completa e
+                                    intervalos mais curtos.
+                                </p>
+                            </FadeIn>
+                            <FadeIn delay={0.08}>
+                                <PlanPricingGrid
+                                    plans={plans}
+                                    mode="marketing"
+                                    isAuthenticated={Boolean(auth.user)}
+                                />
+                            </FadeIn>
                         </div>
                     </section>
 
