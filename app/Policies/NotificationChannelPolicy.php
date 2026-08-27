@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\NotificationChannel;
 use App\Models\User;
+use App\Services\Billing\PlanLimitsService;
 
 class NotificationChannelPolicy
 {
@@ -19,7 +20,13 @@ class NotificationChannelPolicy
 
     public function create(User $user): bool
     {
-        return true;
+        $limits = app(PlanLimitsService::class)->forUser($user);
+
+        if ($limits->maxNotificationChannels === null) {
+            return true;
+        }
+
+        return $user->notificationChannels()->count() < $limits->maxNotificationChannels;
     }
 
     public function update(User $user, NotificationChannel $notificationChannel): bool

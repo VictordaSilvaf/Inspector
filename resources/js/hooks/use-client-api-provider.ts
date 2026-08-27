@@ -170,7 +170,7 @@ function mapServerErrors(errors: ServerValidationErrors): {
 function resolveInitialInterval(
     intervalSeconds: number | undefined,
 ): ApiMonitorIntervalSeconds {
-    if (intervalSeconds === 10 || intervalSeconds === 30 || intervalSeconds === 60) {
+    if (intervalSeconds === 5 || intervalSeconds === 10 || intervalSeconds === 15 || intervalSeconds === 30 || intervalSeconds === 60) {
         return intervalSeconds;
     }
 

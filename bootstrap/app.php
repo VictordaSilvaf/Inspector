@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsurePlanTwoFactorRequirement;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ThrottleApiMonitorMutations;
@@ -35,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'throttle.monitors' => ThrottleApiMonitorMutations::class,
+            'plan.two-factor' => EnsurePlanTwoFactorRequirement::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

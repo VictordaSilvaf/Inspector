@@ -3,6 +3,7 @@
 namespace App\Http\Requests\ApiInspector;
 
 use App\Rules\SafeMonitorUrl;
+use App\Services\Billing\PlanLimitsService;
 use App\Services\Security\MonitorSecretChangeDetector;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -18,12 +19,15 @@ class StoreApiMonitorRequest extends FormRequest
     {
         $requiresSecretProtection = app(MonitorSecretChangeDetector::class)
             ->storeRequiresSecretProtection($this);
+        $allowedIntervals = app(PlanLimitsService::class)
+            ->forUser($this->user())
+            ->allowedIntervals;
 
         return [
             'name' => ['required', 'string', 'max:255'],
             'url' => ['required', 'string', 'url', 'max:2048', 'regex:/^https?:\/\//i', new SafeMonitorUrl],
             'http_method' => ['required', Rule::in(['GET', 'POST', 'PUT', 'DELETE'])],
-            'interval_seconds' => ['required', 'integer', Rule::in([10, 30, 60])],
+            'interval_seconds' => ['required', 'integer', Rule::in($allowedIntervals)],
             'auth_type' => ['required', Rule::in(['none', 'basic', 'bearer', 'api_key'])],
             'auth_config' => ['nullable', 'array'],
             'auth_config.username' => ['required_if:auth_type,basic', 'nullable', 'string', 'max:255'],
@@ -52,12 +56,12 @@ class StoreApiMonitorRequest extends FormRequest
                 return;
             }
 
-            $maxMonitors = (int) config('monitors.max_per_user', 25);
+            $limits = app(PlanLimitsService::class)->forUser($user);
 
-            if ($user->apiMonitors()->count() >= $maxMonitors) {
+            if ($user->apiMonitors()->count() >= $limits->maxMonitors) {
                 $validator->errors()->add(
                     'name',
-                    "Você atingiu o limite de {$maxMonitors} monitores.",
+                    "Você atingiu o limite de {$limits->maxMonitors} monitores do plano {$limits->plan->label()}.",
                 );
             }
 
@@ -87,7 +91,7 @@ class StoreApiMonitorRequest extends FormRequest
             'url.regex' => 'A URL deve começar com http:// ou https://.',
             'http_method.required' => 'Selecione o método HTTP.',
             'interval_seconds.required' => 'Selecione o intervalo de verificação.',
-            'interval_seconds.in' => 'Selecione um intervalo de verificação válido.',
+            'interval_seconds.in' => 'Este intervalo não está disponível no seu plano.',
             'auth_config.username.required_if' => 'Informe o usuário da API.',
             'auth_config.password.required_if' => 'Informe a senha da API.',
             'auth_config.token.required_if' => 'Informe o token Bearer da API.',

@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { usePage } from '@inertiajs/react';
 import { ApiAuthentication } from '@/components/base/ApiConsulting/components/ApiAuthentication';
 import { ApiUrlMonitor } from '@/components/base/ApiConsulting/components/ApiUrlMonitor';
 import { CredentialConfirmationSection } from '@/components/base/ApiConsulting/components/CredentialConfirmationSection';
@@ -13,16 +14,27 @@ import {
 
 } from '@/hooks/use-client-api-provider';
 import type { ApiMonitorFormInitialValues, UseClientApiProviderOptions } from '@/hooks/use-client-api-provider';
+import type { ApiMonitorIntervalSeconds } from '@/components/base/ApiConsulting/auth';
+
+type SharedPlanLimits = {
+    allowedIntervals: ApiMonitorIntervalSeconds[];
+};
 
 type ApiConsultingProps = {
     initialValues?: ApiMonitorFormInitialValues;
     mode?: UseClientApiProviderOptions['mode'];
+    allowedIntervals?: ApiMonitorIntervalSeconds[];
 };
 
 function ApiConsulting({
     initialValues,
     mode = 'create',
+    allowedIntervals: allowedIntervalsProp,
 }: Readonly<ApiConsultingProps>) {
+    const { auth } = usePage<{ auth: { planLimits: SharedPlanLimits | null } }>().props;
+    const allowedIntervals = allowedIntervalsProp
+        ?? auth.planLimits?.allowedIntervals
+        ?? [30, 60];
     const {
         name,
         setName,
@@ -127,6 +139,7 @@ function ApiConsulting({
 
             <MonitorIntervalSection
                 intervalSeconds={intervalSeconds}
+                allowedIntervals={allowedIntervals}
                 intervalError={intervalError}
                 isLoading={isLoading}
                 onIntervalChange={setIntervalSeconds}

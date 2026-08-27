@@ -2,14 +2,16 @@ const API_HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const;
 
 type ApiHttpMethod = (typeof API_HTTP_METHODS)[number];
 
-const API_MONITOR_INTERVAL_SECONDS = [10, 30, 60] as const;
+const API_MONITOR_INTERVAL_SECONDS = [5, 10, 15, 30, 60] as const;
 
 type ApiMonitorIntervalSeconds = (typeof API_MONITOR_INTERVAL_SECONDS)[number];
 
 const DEFAULT_API_MONITOR_INTERVAL_SECONDS: ApiMonitorIntervalSeconds = 30;
 
 const API_MONITOR_INTERVAL_LABELS: Record<ApiMonitorIntervalSeconds, string> = {
+    5: 'A cada 5 segundos',
     10: 'A cada 10 segundos',
+    15: 'A cada 15 segundos',
     30: 'A cada 30 segundos',
     60: 'A cada 60 segundos',
 };

@@ -16,6 +16,7 @@ import {
 
 type MonitorIntervalSectionProps = {
     intervalSeconds: ApiMonitorIntervalSeconds;
+    allowedIntervals: ApiMonitorIntervalSeconds[];
     intervalError?: string | null;
     isLoading: boolean;
     onIntervalChange: (value: ApiMonitorIntervalSeconds) => void;
@@ -23,6 +24,7 @@ type MonitorIntervalSectionProps = {
 
 function MonitorIntervalSection({
     intervalSeconds,
+    allowedIntervals,
     intervalError,
     isLoading,
     onIntervalChange,
@@ -59,7 +61,7 @@ function MonitorIntervalSection({
                         <SelectValue placeholder="Selecione o intervalo" />
                     </SelectTrigger>
                     <SelectContent>
-                        {API_MONITOR_INTERVAL_SECONDS.map((interval) => (
+                        {allowedIntervals.map((interval) => (
                             <SelectItem key={interval} value={String(interval)}>
                                 {API_MONITOR_INTERVAL_LABELS[interval]}
                             </SelectItem>

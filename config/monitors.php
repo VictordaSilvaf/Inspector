@@ -2,8 +2,6 @@
 
 return [
 
-    'max_per_user' => (int) env('MONITOR_MAX_PER_USER', 25),
-
     'require_two_factor_for_secrets' => env(
         'MONITOR_REQUIRE_2FA_FOR_SECRETS',
         env('APP_ENV') === 'production',

@@ -9,6 +9,7 @@ use App\Models\ApiMonitor;
 use App\Models\ApiMonitorCheck;
 use App\Services\ApiMonitorChecker;
 use App\Services\ApiMonitorPersistenceService;
+use App\Services\Billing\PlanLimitsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -77,8 +78,12 @@ class ApiMonitorController extends Controller
 
         $apiMonitor->load(['secret', 'headers']);
 
+        $limits = app(PlanLimitsService::class)->forUser($request->user());
+        $historySince = now()->subDays($limits->historyRetentionDays);
+
         $checks = Inertia::scroll(
             fn () => $apiMonitor->checks()
+                ->where('checked_at', '>=', $historySince)
                 ->latest('checked_at')
                 ->paginate(15)
                 ->withQueryString()
@@ -88,6 +93,8 @@ class ApiMonitorController extends Controller
         return Inertia::render('ApiInspector/show', [
             'monitor' => $this->persistence->toEditableArray($apiMonitor),
             'checks' => $checks,
+            'historyRetentionDays' => $limits->historyRetentionDays,
+            'canAccessCredentialAudit' => $limits->credentialAudit,
         ]);
     }
 

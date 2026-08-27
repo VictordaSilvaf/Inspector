@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\SubscriptionPlan;
 use App\Mail\MonitorSecretChangedMail;
 use App\Models\ApiMonitor;
 use App\Models\User;
@@ -91,20 +92,18 @@ test('rotating monitor secret requires current password', function () {
     ])->assertSessionHasErrors('current_password');
 });
 
-test('user cannot exceed monitor limit', function () {
-    config(['monitors.max_per_user' => 2]);
-
+test('user cannot exceed monitor limit for their plan', function () {
     Http::fake([
         '*' => Http::response([], 200),
     ]);
 
-    $user = User::factory()->create();
+    $user = User::factory()->onPlan(SubscriptionPlan::Free)->create();
 
-    ApiMonitor::factory()->for($user)->count(2)->create();
+    ApiMonitor::factory()->for($user)->count(3)->create();
 
     $this->actingAs($user)->post(route('api-inspector.store'), [
-        'name' => 'Third monitor',
-        'url' => 'https://api.example.com/third',
+        'name' => 'Fourth monitor',
+        'url' => 'https://api.example.com/fourth',
         'http_method' => 'GET',
         'interval_seconds' => 30,
         'auth_type' => 'none',

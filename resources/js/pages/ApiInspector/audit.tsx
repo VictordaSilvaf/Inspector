@@ -1,7 +1,8 @@
 import { InfiniteScroll, router } from '@inertiajs/react';
 import SeoHead from '@/components/seo-head';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, DownloadIcon } from 'lucide-react';
 import { show as apiInspectorShow } from '@/routes/api-inspector';
+import { exportMethod as exportAudit } from '@/routes/api-inspector/audit';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -36,6 +37,7 @@ type ApiInspectorAuditProps = {
         url: string;
     };
     audits: PaginatedAudits;
+    canExportAudit: boolean;
 };
 
 function formatAuditDate(createdAt: string): string {
@@ -104,6 +106,7 @@ function AuditHistoryItem({
 export default function ApiInspectorAudit({
     monitor,
     audits,
+    canExportAudit,
 }: Readonly<ApiInspectorAuditProps>) {
     return (
         <>
@@ -132,6 +135,18 @@ export default function ApiInspectorAudit({
                             Registro de criação, alteração e remoção de
                             credenciais. Valores de segredos nunca são exibidos.
                         </p>
+                        {canExportAudit && (
+                            <Button
+                                variant="outline"
+                                className="mt-4 w-fit rounded-full"
+                                asChild
+                            >
+                                <a href={exportAudit.url(monitor.id)}>
+                                    <DownloadIcon className="size-4" />
+                                    Exportar CSV
+                                </a>
+                            </Button>
+                        )}
                     </div>
                 </div>
 

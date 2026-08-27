@@ -5,6 +5,7 @@ namespace App\Http\Requests\ApiInspector;
 use App\Enums\MonitorAlertOperator;
 use App\Enums\MonitorAlertType;
 use App\Models\ApiMonitor;
+use App\Services\Billing\PlanLimitsService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -81,6 +82,25 @@ class StoreMonitorAlertRequest extends FormRequest
                 if (! in_array((string) $value, ['false', '0', 'unavailable'], true)) {
                     $validator->errors()->add('value', 'Use false para alertar quando a API estiver indisponível.');
                 }
+            }
+
+            $monitor = $this->route('api_monitor');
+
+            if (! $monitor instanceof ApiMonitor) {
+                return;
+            }
+
+            $limits = app(PlanLimitsService::class)->forUser($this->user());
+
+            if ($limits->maxAlertsPerMonitor === null) {
+                return;
+            }
+
+            if ($monitor->alerts()->count() >= $limits->maxAlertsPerMonitor) {
+                $validator->errors()->add(
+                    'type',
+                    "Seu plano permite no máximo {$limits->maxAlertsPerMonitor} alerta por monitor.",
+                );
             }
         });
     }

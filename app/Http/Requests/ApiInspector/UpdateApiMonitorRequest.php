@@ -5,6 +5,7 @@ namespace App\Http\Requests\ApiInspector;
 use App\Models\ApiMonitor;
 use App\Rules\SafeMonitorUrl;
 use App\Services\ApiMonitorSecretService;
+use App\Services\Billing\PlanLimitsService;
 use App\Services\Security\MonitorSecretChangeDetector;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -29,12 +30,15 @@ class UpdateApiMonitorRequest extends FormRequest
         $monitor = $this->route('api_monitor');
         $requiresSecretProtection = $monitor instanceof ApiMonitor
             && app(MonitorSecretChangeDetector::class)->updateRequiresSecretProtection($this, $monitor);
+        $allowedIntervals = app(PlanLimitsService::class)
+            ->forUser($this->user())
+            ->allowedIntervals;
 
         return [
             'name' => ['required', 'string', 'max:255'],
             'url' => ['required', 'string', 'url', 'max:2048', 'regex:/^https?:\/\//i', new SafeMonitorUrl],
             'http_method' => ['required', Rule::in(['GET', 'POST', 'PUT', 'DELETE'])],
-            'interval_seconds' => ['required', 'integer', Rule::in([10, 30, 60])],
+            'interval_seconds' => ['required', 'integer', Rule::in($allowedIntervals)],
             'auth_type' => ['required', Rule::in(['none', 'basic', 'bearer', 'api_key'])],
             'auth_config' => ['nullable', 'array'],
             'auth_config.username' => ['required_if:auth_type,basic', 'nullable', 'string', 'max:255'],
@@ -67,7 +71,7 @@ class UpdateApiMonitorRequest extends FormRequest
             'url.regex' => 'A URL deve começar com http:// ou https://.',
             'http_method.required' => 'Selecione o método HTTP.',
             'interval_seconds.required' => 'Selecione o intervalo de verificação.',
-            'interval_seconds.in' => 'Selecione um intervalo de verificação válido.',
+            'interval_seconds.in' => 'Este intervalo não está disponível no seu plano.',
             'auth_config.username.required_if' => 'Informe o usuário da API.',
             'auth_config.password.required' => 'Informe a senha da API.',
             'auth_config.token.required' => 'Informe o token Bearer da API.',

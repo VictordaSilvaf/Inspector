@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Billing\PlanLimitsService;
 use App\Support\Seo;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -42,6 +43,9 @@ class HandleInertiaRequests extends Middleware
             'seo' => Seo::shared(),
             'auth' => [
                 'user' => $request->user(),
+                'planLimits' => $request->user() !== null
+                    ? app(PlanLimitsService::class)->forUser($request->user())->toFrontendArray()
+                    : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

@@ -21,7 +21,7 @@ Route::post('unsubscribe/{token}', [UnsubscribeController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('unsubscribe.store');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'plan.two-factor'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::prefix('api-inspector')->name('api-inspector.')->group(function () {
@@ -35,6 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('alerts.index');
         Route::get('{api_monitor}/audit', [MonitorSecretAuditController::class, 'index'])
             ->name('audit.index');
+        Route::get('{api_monitor}/audit/export', [MonitorSecretAuditController::class, 'export'])
+            ->name('audit.export');
         Route::post('{api_monitor}/alerts', [MonitorAlertController::class, 'store'])
             ->name('alerts.store');
         Route::delete('{api_monitor}/alerts/{monitor_alert}', [MonitorAlertController::class, 'destroy'])

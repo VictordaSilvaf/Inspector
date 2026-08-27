@@ -58,6 +58,8 @@ type PaginatedChecks = {
 type ApiInspectorShowProps = {
     monitor: ApiMonitorDetail;
     checks: PaginatedChecks;
+    historyRetentionDays: number;
+    canAccessCredentialAudit: boolean;
 };
 
 function shouldRefreshHistoryList(): boolean {
@@ -246,6 +248,8 @@ function CheckHistoryItem({
 export default function ApiInspectorShow({
     monitor,
     checks,
+    historyRetentionDays,
+    canAccessCredentialAudit,
 }: Readonly<ApiInspectorShowProps>) {
     usePoll(
         LIVE_REFRESH_INTERVAL_MS,
@@ -321,16 +325,18 @@ export default function ApiInspectorShow({
                                 <BellIcon className="size-4" />
                                 Gerenciar alertas
                             </Button>
-                            <Button
-                                variant="outline"
-                                className="w-fit rounded-full border-hairline bg-transparent hover:bg-surface-strong"
-                                onClick={() =>
-                                    router.visit(auditIndex.url(monitor.id))
-                                }
-                            >
-                                <HistoryIcon className="size-4" />
-                                Auditoria de credenciais
-                            </Button>
+                            {canAccessCredentialAudit && (
+                                <Button
+                                    variant="outline"
+                                    className="w-fit rounded-full border-hairline bg-transparent hover:bg-surface-strong"
+                                    onClick={() =>
+                                        router.visit(auditIndex.url(monitor.id))
+                                    }
+                                >
+                                    <HistoryIcon className="size-4" />
+                                    Auditoria de credenciais
+                                </Button>
+                            )}
                         </div>
                         <motion.div
                             className="card relative max-w-3xl"
@@ -416,7 +422,8 @@ export default function ApiInspectorShow({
                             </h2>
                             <p className="text-sm text-ink-muted">
                                 Logs das consultas feitas a esta API,
-                                atualizados em tempo real.
+                                atualizados em tempo real. Retenção de{' '}
+                                {historyRetentionDays} dias conforme seu plano.
                             </p>
                         </div>
 
