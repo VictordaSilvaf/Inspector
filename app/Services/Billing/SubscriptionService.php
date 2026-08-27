@@ -4,7 +4,6 @@ namespace App\Services\Billing;
 
 use App\Enums\SubscriptionPlan;
 use App\Models\User;
-use Illuminate\Validation\ValidationException;
 
 final class SubscriptionService
 {
@@ -59,22 +58,5 @@ final class SubscriptionService
         }
 
         return $errors;
-    }
-
-    public function changePlan(User $user, SubscriptionPlan $targetPlan): User
-    {
-        $errors = $this->validatePlanChange($user, $targetPlan);
-
-        if ($errors !== []) {
-            throw ValidationException::withMessages([
-                'plan' => $errors[0],
-            ]);
-        }
-
-        $user->update([
-            'plan' => $targetPlan,
-        ]);
-
-        return $user->fresh() ?? $user;
     }
 }

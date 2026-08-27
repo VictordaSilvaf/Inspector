@@ -25,3 +25,10 @@ export type SubscriptionUsage = {
     monitors: number;
     notificationChannels: number;
 };
+
+export type SubscriptionBillingSummary = {
+    hasStripeCustomer: boolean;
+    subscribed: boolean;
+    onGracePeriod: boolean;
+    endsAt: string | null;
+};

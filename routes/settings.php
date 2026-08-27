@@ -42,4 +42,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('subscription.edit');
     Route::patch('settings/subscription', [SubscriptionController::class, 'update'])
         ->name('subscription.update');
+    Route::get('settings/subscription/checkout/success', [SubscriptionController::class, 'checkoutSuccess'])
+        ->name('subscription.checkout.success');
+    Route::get('settings/subscription/billing-portal', [SubscriptionController::class, 'billingPortal'])
+        ->name('subscription.billing-portal');
 });

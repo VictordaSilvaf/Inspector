@@ -34,5 +34,11 @@
         <env name="MONITOR_SECRETS_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="/>
         <env name="MONITOR_URL_REQUIRE_DNS" value="false"/>
         <env name="MONITOR_REQUIRE_2FA_FOR_SECRETS" value="false"/>
+        <env name="STRIPE_KEY" value="pk_test_inspector"/>
+        <env name="STRIPE_SECRET" value="sk_test_inspector"/>
+        <env name="STRIPE_WEBHOOK_SECRET" value="whsec_test_inspector"/>
+        <env name="STRIPE_PRICE_PRO" value="price_test_pro"/>
+        <env name="STRIPE_PRICE_BUSINESS" value="price_test_business"/>
+        <env name="CASHIER_CURRENCY" value="brl"/>
     </php>
 </phpunit>

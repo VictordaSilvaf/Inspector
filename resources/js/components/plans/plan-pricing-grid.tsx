@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Check } from 'lucide-react';
+import { edit as subscriptionEdit } from '@/routes/subscription';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { register } from '@/routes';
-import { edit as subscriptionEdit } from '@/routes/subscription';
 import type { PlanCatalogItem } from '@/types/plan';
 
 type PlanPricingGridProps = {
@@ -73,7 +73,7 @@ export default function PlanPricingGrid({
                                 </p>
                                 {plan.monthlyPriceCents > 0 && (
                                     <p className="text-xs text-ink-soft">
-                                        por mês · cobrança simulada
+                                        por mês · cobrança via Stripe
                                     </p>
                                 )}
                             </div>
@@ -165,8 +165,10 @@ function ManageAction({
             {isCurrent
                 ? 'Plano ativo'
                 : isProcessing
-                  ? 'Alterando...'
-                  : `Mudar para ${plan.name}`}
+                  ? 'Redirecionando...'
+                  : plan.monthlyPriceCents > 0
+                    ? `Assinar ${plan.name}`
+                    : `Mudar para ${plan.name}`}
         </Button>
     );
 }

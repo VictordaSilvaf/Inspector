@@ -1,7 +1,6 @@
 import { motion } from 'motion/react';
 import {
     API_MONITOR_INTERVAL_LABELS,
-    API_MONITOR_INTERVAL_SECONDS,
 } from '@/components/base/ApiConsulting/auth';
 import type { ApiMonitorIntervalSeconds } from '@/components/base/ApiConsulting/auth';
 import InputError from '@/components/input-error';

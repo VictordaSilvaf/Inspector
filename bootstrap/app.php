@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        $middleware->validateCsrfTokens(except: [
+            'stripe/*',
+        ]);
+
         $trustedProxies = env('TRUSTED_PROXIES');
 
         if (is_string($trustedProxies) && $trustedProxies !== '') {

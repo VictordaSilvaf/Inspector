@@ -1,9 +1,9 @@
-import SeoHead from '@/components/seo-head';
 import {
     create as apiInspectorCreate,
     index as apiInspectorIndex,
 } from '@/routes/api-inspector';
 import { ApiConsulting } from '@/components/base/ApiConsulting';
+import SeoHead from '@/components/seo-head';
 
 export default function ApiInspectorCreate() {
     return (

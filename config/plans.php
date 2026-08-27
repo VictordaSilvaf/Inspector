@@ -19,6 +19,7 @@ return [
             'credential_audit_export' => false,
             'requires_two_factor' => false,
             'monthly_price_cents' => 0,
+            'stripe_price_id' => null,
             'description' => 'Para experimentar e monitorar poucos endpoints.',
         ],
         SubscriptionPlan::Pro->value => [
@@ -31,6 +32,7 @@ return [
             'credential_audit_export' => false,
             'requires_two_factor' => false,
             'monthly_price_cents' => 4900,
+            'stripe_price_id' => env('STRIPE_PRICE_PRO'),
             'description' => 'Para times que precisam de mais monitores e alertas.',
         ],
         SubscriptionPlan::Business->value => [
@@ -43,6 +45,7 @@ return [
             'credential_audit_export' => true,
             'requires_two_factor' => true,
             'monthly_price_cents' => 14900,
+            'stripe_price_id' => env('STRIPE_PRICE_BUSINESS'),
             'description' => 'Para produção crítica com auditoria e compliance.',
         ],
     ],

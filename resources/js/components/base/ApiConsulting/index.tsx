@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
 import { usePage } from '@inertiajs/react';
+import { motion } from 'motion/react';
 import { ApiAuthentication } from '@/components/base/ApiConsulting/components/ApiAuthentication';
 import { ApiUrlMonitor } from '@/components/base/ApiConsulting/components/ApiUrlMonitor';
 import { CredentialConfirmationSection } from '@/components/base/ApiConsulting/components/CredentialConfirmationSection';
@@ -14,7 +14,7 @@ import {
 
 } from '@/hooks/use-client-api-provider';
 import type { ApiMonitorFormInitialValues, UseClientApiProviderOptions } from '@/hooks/use-client-api-provider';
-import type { ApiMonitorIntervalSeconds } from '@/components/base/ApiConsulting/auth';
+import type { ApiMonitorIntervalSeconds } from './auth';
 
 type SharedPlanLimits = {
     allowedIntervals: ApiMonitorIntervalSeconds[];

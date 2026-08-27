@@ -1,5 +1,4 @@
 import { router, usePoll } from '@inertiajs/react';
-import SeoHead from '@/components/seo-head';
 import { EyeIcon, PlusIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Variants } from 'motion/react';
@@ -7,6 +6,7 @@ import { create, index as apiInspectorIndex, show } from '@/routes/api-inspector
 import { index as alertsIndex } from '@/routes/api-inspector/alerts';
 import { API_MONITOR_INTERVAL_LABELS } from '@/components/base/ApiConsulting/auth';
 import type { ApiMonitorIntervalSeconds } from '@/components/base/ApiConsulting/auth';
+import SeoHead from '@/components/seo-head';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import ApiStatusIndicator from '@/components/base/ApiStatusIndicator';
